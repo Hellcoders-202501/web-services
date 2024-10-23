@@ -7,6 +7,6 @@ import com.techcompany.fastporte.users.domain.model.commands.driver.RegisterDriv
 import java.util.Optional;
 
 public interface DriverCommandService {
-    Driver handle(RegisterDriverCommand command);
-    Optional<Driver> handle(DeleteDriverCommand command);
+    Optional<Driver> handle(RegisterDriverCommand command);
+    void handle(DeleteDriverCommand command);
 }

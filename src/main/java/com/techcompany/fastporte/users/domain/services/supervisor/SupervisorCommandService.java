@@ -8,5 +8,5 @@ import java.util.Optional;
 
 public interface SupervisorCommandService {
     Supervisor handle(RegisterSupervisorCommand command);
-    Optional<Supervisor> handle(DeleteSupervisorCommand command);
+    void handle(DeleteSupervisorCommand command);
 }
