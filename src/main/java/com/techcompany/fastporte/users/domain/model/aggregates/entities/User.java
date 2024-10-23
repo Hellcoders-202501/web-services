@@ -1,5 +1,7 @@
 package com.techcompany.fastporte.users.domain.model.aggregates.entities;
 
+import com.techcompany.fastporte.users.domain.model.commands.driver.RegisterDriverCommand;
+import com.techcompany.fastporte.users.domain.model.commands.supervisor.RegisterSupervisorCommand;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -52,5 +54,27 @@ public class User implements Serializable {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles = new HashSet<>();
+
+    public User(RegisterDriverCommand command) {
+        this.name = command.name();
+        this.firstLastName = command.firstLastName();
+        this.secondLastName = command.secondLastName();
+        this.email = command.email();
+        this.phone = command.phone();
+        this.username = command.username();
+        this.password = command.password();
+        this.createdAt = new Date();
+    }
+
+    public User(RegisterSupervisorCommand command) {
+        this.name = command.name();
+        this.firstLastName = command.firstLastName();
+        this.secondLastName = command.secondLastName();
+        this.email = command.email();
+        this.phone = command.phone();
+        this.username = command.username();
+        this.password = command.password();
+        this.createdAt = new Date();
+    }
 
 }

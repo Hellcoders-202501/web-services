@@ -1,5 +1,6 @@
 package com.techcompany.fastporte.users.domain.model.aggregates.entities;
 
+import com.techcompany.fastporte.users.domain.model.commands.supervisor.RegisterSupervisorCommand;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -28,4 +29,9 @@ public class Supervisor implements Serializable {
 
     @OneToMany(mappedBy = "supervisor", fetch = FetchType.LAZY)
     private List<Driver> drivers;
+
+    public Supervisor(RegisterSupervisorCommand command) {
+        this.user = new User(command);
+        //this.department = command.department();
+    }
 }

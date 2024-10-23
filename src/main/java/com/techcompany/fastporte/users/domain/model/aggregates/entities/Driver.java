@@ -1,5 +1,6 @@
 package com.techcompany.fastporte.users.domain.model.aggregates.entities;
 
+import com.techcompany.fastporte.users.domain.model.commands.driver.RegisterDriverCommand;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -28,4 +29,10 @@ public class Driver implements Serializable {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "supervisor_id")
     private Supervisor supervisor;
+
+    public Driver(RegisterDriverCommand command) {
+
+        this.user = new User(command);
+        //this.plate = command.plate();
+    }
 }
