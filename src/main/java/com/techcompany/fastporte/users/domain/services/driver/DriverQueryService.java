@@ -14,4 +14,5 @@ public interface DriverQueryService {
     Optional<Driver> handle(GetDriverPrivateProfileQuery query);
     Optional<Driver> handle(GetDriverPublicProfileQuery query);
 
+    Boolean handle(CheckDriverExistsByIdQuery query);
 }
