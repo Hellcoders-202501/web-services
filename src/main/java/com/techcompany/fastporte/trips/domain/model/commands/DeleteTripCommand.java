@@ -1,4 +1,4 @@
 package com.techcompany.fastporte.trips.domain.model.commands;
 
-public record DeleteTripCommand() {
+public record DeleteTripCommand(Long tripId) {
 }
