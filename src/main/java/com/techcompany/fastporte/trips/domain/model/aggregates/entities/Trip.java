@@ -1,5 +1,6 @@
 package com.techcompany.fastporte.trips.domain.model.aggregates.entities;
 
+import com.techcompany.fastporte.trips.domain.model.commands.CreateTripCommand;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -40,4 +41,12 @@ public class Trip implements Serializable {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "status_id")
     private TripStatus status;
+
+    public Trip(CreateTripCommand command) {
+        this.origin = command.origin();
+        this.destination = command.destination();
+        this.startTime = command.startTime();
+        this.endTime = command.endTime();
+        this.driverId = command.driverId();
+    }
 }
