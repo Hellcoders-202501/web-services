@@ -13,6 +13,7 @@ import com.techcompany.fastporte.users.infrastructure.persistence.jpa.UserReposi
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
 import java.util.Set;
 
 @Transactional
@@ -30,7 +31,7 @@ public class SupervisorCommandServiceImp implements SupervisorCommandService {
     }
 
     @Override
-    public Supervisor handle(RegisterSupervisorCommand command) {
+    public Optional<Supervisor> handle(RegisterSupervisorCommand command) {
         // Mapear el objeto SupervisorRegisterDto a un objeto Supervisor
         Supervisor supervisor = new Supervisor(command);
 
@@ -54,7 +55,7 @@ public class SupervisorCommandServiceImp implements SupervisorCommandService {
         Supervisor savedSupervisor = supervisorRepository.save(supervisor);
 
         //return supervisorMapper.supervisorToResponseDto(savedSupervisor);
-        return savedSupervisor;
+        return Optional.of(savedSupervisor);
     }
 
     @Override

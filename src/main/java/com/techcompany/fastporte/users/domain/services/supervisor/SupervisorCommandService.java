@@ -7,6 +7,6 @@ import com.techcompany.fastporte.users.domain.model.commands.supervisor.Register
 import java.util.Optional;
 
 public interface SupervisorCommandService {
-    Supervisor handle(RegisterSupervisorCommand command);
+    Optional<Supervisor> handle(RegisterSupervisorCommand command);
     void handle(DeleteSupervisorCommand command);
 }
