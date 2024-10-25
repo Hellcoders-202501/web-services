@@ -1,6 +1,5 @@
 package com.techcompany.fastporte.trips.interfaces.rest;
 
-import com.techcompany.fastporte.trips.application.dtos.TripCreatedDto;
 import com.techcompany.fastporte.trips.application.dtos.TripInformationDto;
 import com.techcompany.fastporte.trips.domain.model.aggregates.entities.Trip;
 import com.techcompany.fastporte.trips.domain.model.commands.DeleteTripCommand;
