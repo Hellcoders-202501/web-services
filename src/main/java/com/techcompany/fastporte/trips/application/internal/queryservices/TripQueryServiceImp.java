@@ -37,7 +37,7 @@ public class TripQueryServiceImp implements TripQueryService {
 
     @Override
     public List<Trip> handle(GetTripsBySupervisorIdQuery query) {
-        return List.of(); //ToDo
+        return tripRepository.findAllBySupervisorId(query.supervisorId());
     }
 
     @Override
@@ -52,6 +52,6 @@ public class TripQueryServiceImp implements TripQueryService {
 
     @Override
     public List<Trip> handle(GetTripsBySupervisorIdAndStatusQuery query) {
-        return List.of(); //ToDo
+        return tripRepository.findAllBySupervisorIdAndStatus_Id(query.supervisorId(), query.statusId());
     }
 }
