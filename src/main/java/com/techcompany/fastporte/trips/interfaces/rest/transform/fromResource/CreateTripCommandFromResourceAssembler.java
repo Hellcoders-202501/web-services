@@ -7,6 +7,7 @@ public class CreateTripCommandFromResourceAssembler {
     public static CreateTripCommand toCommandFromResource(CreateTripResource resource) {
         return new CreateTripCommand(
                 resource.driverId(),
+                resource.supervisorId(),
                 resource.origin(),
                 resource.destination(),
                 resource.startTime(),
