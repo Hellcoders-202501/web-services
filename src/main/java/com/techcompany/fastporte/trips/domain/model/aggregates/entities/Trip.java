@@ -38,6 +38,9 @@ public class Trip implements Serializable {
     @Column(name = "driver_id")
     private Long driverId;
 
+    @Column(name = "supervisor_id")
+    private Long supervisorId;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "status_id")
     private TripStatus status;
@@ -48,5 +51,6 @@ public class Trip implements Serializable {
         this.startTime = command.startTime();
         this.endTime = command.endTime();
         this.driverId = command.driverId();
+        this.supervisorId = command.supervisorId();
     }
 }
