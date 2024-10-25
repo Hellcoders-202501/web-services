@@ -28,15 +28,17 @@ public class DriverAcl {
 
     public Optional<DriverInformationDto> findDriverById(Long id) {
         String url = BASE_URL + id;
-
+        logger.info("Driver found: " + url);
         try {
             DriverInformationDto driverDto = restTemplate.getForObject(url, DriverInformationDto.class);
             if (driverDto != null) {
+                logger.info("Driver found: " + driverDto.firstLastName());
                 return Optional.of(driverDto);
             } else {
                 return Optional.empty();
             }
         } catch (Exception e) {
+            logger.error("Error finding driver: " + e.getMessage());
             return Optional.empty();
         }
     }

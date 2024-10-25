@@ -1,6 +1,7 @@
 package com.techcompany.fastporte.trips.interfaces.rest.transform.fromEntity;
 
 import com.techcompany.fastporte.trips.application.dtos.TripCreatedDto;
+import com.techcompany.fastporte.trips.application.dtos.TripInformationDto;
 import com.techcompany.fastporte.trips.domain.model.aggregates.entities.Trip;
 import com.techcompany.fastporte.trips.interfaces.rest.resources.TripInformationResource;
 
@@ -20,7 +21,7 @@ public class TripInformationResourceFromEntityAssembler {
         );
     }
 
-    public static TripInformationResource toResourceFromDto(TripCreatedDto trip){
+    public static TripInformationResource toResourceFromDto(TripInformationDto trip){
         return new TripInformationResource(
                 trip.getTripId(),
                 trip.getDriverId(),

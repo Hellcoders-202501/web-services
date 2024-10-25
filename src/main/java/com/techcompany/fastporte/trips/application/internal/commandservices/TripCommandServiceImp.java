@@ -1,7 +1,7 @@
 package com.techcompany.fastporte.trips.application.internal.commandservices;
 
 import com.techcompany.fastporte.shared.dtos.DriverInformationDto;
-import com.techcompany.fastporte.trips.application.dtos.TripCreatedDto;
+import com.techcompany.fastporte.trips.application.dtos.TripInformationDto;
 import com.techcompany.fastporte.trips.domain.model.aggregates.entities.Trip;
 import com.techcompany.fastporte.trips.domain.model.aggregates.entities.TripStatus;
 import com.techcompany.fastporte.trips.domain.model.aggregates.enums.Status;
@@ -31,7 +31,7 @@ public class TripCommandServiceImp implements TripCommandService {
     }
 
     @Override
-    public Optional<TripCreatedDto> handle(CreateTripCommand command) {
+    public Optional<TripInformationDto> handle(CreateTripCommand command) {
 
         // Mapear el objeto TripRegisterDto a un objeto Trip
         Trip trip = new Trip(command);
@@ -50,7 +50,7 @@ public class TripCommandServiceImp implements TripCommandService {
             trip = tripRepository.save(trip);
 
             // Mapear el objeto Trip a un objeto TripCreatedDto
-            TripCreatedDto tripCreatedDto = TripCreatedDto.builder()
+            TripInformationDto tripInformationDto = TripInformationDto.builder()
                     .tripId(trip.getId())
                     .driverId(driver.get().id())
                     .driverName(driver.get().name() + " " + driver.get().firstLastName() + " " + driver.get().secondLastName())
@@ -61,7 +61,7 @@ public class TripCommandServiceImp implements TripCommandService {
                     .status(trip.getStatus().getStatus())
                     .build();
 
-            return Optional.of(tripCreatedDto);
+            return Optional.of(tripInformationDto);
 
         } else {
             throw new RuntimeException("Error: El conductor con el id '" + trip.getDriverId() + "' no existe en la base de datos");

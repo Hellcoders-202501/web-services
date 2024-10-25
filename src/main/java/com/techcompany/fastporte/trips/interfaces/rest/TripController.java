@@ -1,6 +1,7 @@
 package com.techcompany.fastporte.trips.interfaces.rest;
 
 import com.techcompany.fastporte.trips.application.dtos.TripCreatedDto;
+import com.techcompany.fastporte.trips.application.dtos.TripInformationDto;
 import com.techcompany.fastporte.trips.domain.model.aggregates.entities.Trip;
 import com.techcompany.fastporte.trips.domain.model.commands.DeleteTripCommand;
 import com.techcompany.fastporte.trips.domain.model.queries.*;
@@ -10,6 +11,7 @@ import com.techcompany.fastporte.trips.interfaces.rest.resources.CreateTripResou
 import com.techcompany.fastporte.trips.interfaces.rest.resources.TripInformationResource;
 import com.techcompany.fastporte.trips.interfaces.rest.transform.fromEntity.TripInformationResourceFromEntityAssembler;
 import com.techcompany.fastporte.trips.interfaces.rest.transform.fromResource.CreateTripCommandFromResourceAssembler;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -34,14 +36,15 @@ public class TripController {
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<TripInformationResource> findById(@PathVariable Long id) {
         try {
-            Optional<Trip> trip = tripQueryService.handle(new GetTripByIdQuery(id));
+            Optional<TripInformationDto> trip = tripQueryService.handle(new GetTripByIdQuery(id));
 
             if (trip.isPresent()) {
-                return ResponseEntity.status(HttpStatus.OK).body(TripInformationResourceFromEntityAssembler.toResourceFromEntity(trip.get()));
+                return ResponseEntity.status(HttpStatus.OK).body(TripInformationResourceFromEntityAssembler.toResourceFromDto(trip.get()));
             } else {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
             }
         } catch (Exception e) {
+            System.out.println(e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
@@ -142,12 +145,12 @@ public class TripController {
     }
 
     @PostMapping(value = "/create", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<TripInformationResource> save(@RequestBody CreateTripResource resource) {
+    public ResponseEntity<TripInformationResource> save(@Valid @RequestBody CreateTripResource resource) {
         try {
-            Optional<TripCreatedDto> trip = tripCommandService.handle(CreateTripCommandFromResourceAssembler.toCommandFromResource(resource));
+            Optional<TripInformationDto> trip = tripCommandService.handle(CreateTripCommandFromResourceAssembler.toCommandFromResource(resource));
             return trip.map(TripInformationResourceFromEntityAssembler::toResourceFromDto)
                     .map(tripInformationResource -> ResponseEntity.status(HttpStatus.CREATED).body(tripInformationResource))
-                    .orElseGet(() -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null));
+                    .orElseGet(() -> ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
