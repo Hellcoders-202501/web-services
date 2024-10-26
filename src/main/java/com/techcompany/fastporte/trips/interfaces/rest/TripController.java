@@ -14,6 +14,7 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,6 +23,7 @@ import java.util.Optional;
 @CrossOrigin
 @RestController
 @RequestMapping("/api/trips")
+@PreAuthorize("hasRole('ROLE_SUPERVISOR') or hasRole('ROLE_DRIVER') or hasRole('ROLE_ADMIN')")
 public class TripController {
 
     private final TripCommandService tripCommandService;
