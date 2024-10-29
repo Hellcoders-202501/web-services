@@ -24,7 +24,7 @@ public class UserDetailsServiceImp implements UserDetailsService {
     @Override
     public UserDetailsImp loadUserByUsername(String username) {
 
-        Optional<User> driver = userRepository.findByUsername(username);
+        Optional<User> driver = userRepository.findByEmail(username);
         if (driver.isPresent()) {
 
             // Mapear roles a objetos GrantedAuthority
