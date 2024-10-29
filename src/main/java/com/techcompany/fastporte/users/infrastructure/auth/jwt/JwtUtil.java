@@ -43,16 +43,17 @@ public class JwtUtil {
         return extractExpiration(token).before(new Date());
     }
 
-    public String generateToken(String username, Long userId) {
+    public String generateToken(String username, Long userId, String role) {
         Map<String, Object> claims = new HashMap<>();
-        return createToken(claims, username, userId);
+        return createToken(claims, username, userId, role);
     }
 
-    private String createToken(Map<String, Object> claims, String subject, Long userId) {
+    private String createToken(Map<String, Object> claims, String subject, Long userId, String role) {
         return Jwts.builder()
                 .claims(claims)
                 .subject(subject)
-                .claim("userId", userId)
+                .claim("id", userId)
+                .claim("role", role)
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10)) // 10 horas de validez
                 .signWith(secretKey)

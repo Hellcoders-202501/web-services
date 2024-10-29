@@ -15,4 +15,5 @@ public interface SupervisorRepository extends JpaRepository<Supervisor, Long> {
     Optional<Supervisor> findByUser_Username(String username);
 
     List<Long> findAllDriversIdById(Long id);
+    Optional<Supervisor> findByUserId(Long userId);
 }

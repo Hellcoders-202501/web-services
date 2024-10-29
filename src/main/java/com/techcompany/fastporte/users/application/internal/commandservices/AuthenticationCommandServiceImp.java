@@ -7,6 +7,7 @@ import com.techcompany.fastporte.users.infrastructure.auth.jwt.JwtUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
@@ -29,7 +30,13 @@ public class AuthenticationCommandServiceImp implements AuthenticationCommandSer
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(command.username(), command.password()));
             final UserDetailsImp userDetails = (UserDetailsImp) userDetailsService.loadUserByUsername(command.username());
-            return jwtUtil.generateToken(userDetails.getUsername(), userDetails.getUserId());
+
+            String role = userDetails.getAuthorities().stream()
+                    .findFirst()
+                    .map(GrantedAuthority::getAuthority)
+                    .orElse("ROLE_USER");
+
+            return jwtUtil.generateToken(userDetails.getUsername(), userDetails.getUserId(), role);
 
         } catch (Exception e) {
             System.out.println("User not found: " + e.getMessage());
