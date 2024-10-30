@@ -4,6 +4,7 @@ import com.techcompany.fastporte.users.domain.model.aggregates.entities.Driver;
 import com.techcompany.fastporte.users.domain.model.aggregates.entities.UserDetailsImp;
 import com.techcompany.fastporte.users.domain.model.commands.driver.DeleteDriverCommand;
 import com.techcompany.fastporte.users.domain.model.queries.driver.GetAllDriversByIdInList;
+import com.techcompany.fastporte.users.domain.model.queries.driver.GetAllDriversBySupervisorIdQuery;
 import com.techcompany.fastporte.users.domain.model.queries.driver.GetAllDriversQuery;
 import com.techcompany.fastporte.users.domain.model.queries.driver.GetDriverByIdQuery;
 import com.techcompany.fastporte.users.domain.services.driver.DriverCommandService;
@@ -85,6 +86,25 @@ public class DriverController {
                 .toList();
 
         return ResponseEntity.ok(driverInformationResources);
+    }
+
+    @GetMapping(value = "/supervisor/{supervisorId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<DriverInformationResource>> findAllBySupervisorId(@PathVariable Long supervisorId) {
+        try{
+            List<Driver> drivers = driverQueryService.handle(new GetAllDriversBySupervisorIdQuery(supervisorId));
+
+            if (drivers.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+            } else {
+                var driverInformationResources = drivers.stream()
+                        .map(DriverInformationResourceFromEntityAssembler::toPublicResourceFromEntity)
+                        .toList();
+
+                return ResponseEntity.status(HttpStatus.OK).body(driverInformationResources);
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
 
     @PostMapping(value = "/register", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
