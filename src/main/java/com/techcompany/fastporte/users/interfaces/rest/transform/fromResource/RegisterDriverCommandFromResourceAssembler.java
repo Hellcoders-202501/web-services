@@ -13,6 +13,7 @@ public class RegisterDriverCommandFromResourceAssembler {
                 resource.phone(),
                 resource.username(),
                 resource.password(),
+                resource.supervisorId(),
                 resource.plate()
         );
     }

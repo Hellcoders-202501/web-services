@@ -88,17 +88,12 @@ public class DriverController {
     }
 
     @PostMapping(value = "/register", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<DriverInformationResource> save(@Valid @RequestBody RegisterDriverResource resource) {
+    public ResponseEntity<?> save(@Valid @RequestBody RegisterDriverResource resource) {
 
-        try {
-            Optional<Driver> driver = driverCommandService.handle(RegisterDriverCommandFromResourceAssembler.toCommandFromResource(resource));
-            return driver.map(DriverInformationResourceFromEntityAssembler::toPublicResourceFromEntity)
-                    .map(driverInformationResource -> ResponseEntity.status(HttpStatus.CREATED).body(driverInformationResource))
-                    .orElseGet(() -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null));
-
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-        }
+        Optional<Driver> driver = driverCommandService.handle(RegisterDriverCommandFromResourceAssembler.toCommandFromResource(resource));
+        return driver.map(DriverInformationResourceFromEntityAssembler::toPublicResourceFromEntity)
+                .map(driverInformationResource -> ResponseEntity.status(HttpStatus.CREATED).body(driverInformationResource))
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null));
     }
 
     @PreAuthorize("hasRole('ROLE_DRIVER') or hasRole('ROLE_ADMIN')")

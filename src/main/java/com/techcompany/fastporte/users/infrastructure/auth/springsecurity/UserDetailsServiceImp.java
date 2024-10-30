@@ -29,11 +29,13 @@ public class UserDetailsServiceImp implements UserDetailsService {
         this.supervisorRepository = supervisorRepository;
     }
 
+    /// This method is used to load user by username or email.
+    /// In this case, we are using email as username.
     @Override
-    public UserDetailsImp loadUserByUsername(String username) {
+    public UserDetailsImp loadUserByUsername(String email) {
 
         //Find user by email
-        Optional<User> user = userRepository.findByEmail(username);
+        Optional<User> user = userRepository.findByEmail(email);
 
         //Find user by username
         //Optional<User> driver = userRepository.findByUsername(username);
@@ -50,11 +52,13 @@ public class UserDetailsServiceImp implements UserDetailsService {
                     .map(role -> new SimpleGrantedAuthority(role.getRoleName().name()))
                     .collect(Collectors.toList());
 
+            // If user is a driver
             Optional<Driver> _driver = driverRepository.findByUserId(user.get().getId());
             if (_driver.isPresent()) {
                 return new UserDetailsImp(_username, _password, _driver.get().getId(), authorities);
             }
 
+            // If user is a supervisor
             Optional<Supervisor> _supervisor = supervisorRepository.findByUserId(user.get().getId());
             if (_supervisor.isPresent()) {
                 return new UserDetailsImp(_username, _password, _supervisor.get().getId(), authorities);
@@ -64,7 +68,7 @@ public class UserDetailsServiceImp implements UserDetailsService {
             //return new UserDetailsImp(user.get().getEmail(), user.get().getPassword(), user.get().getId(), authorities);
         }
 
-        System.out.println("username: " + username + "Not found in users table");
+        System.out.println("Email: " + email + "Not found in users table");
 
         return new UserDetailsImp();
 

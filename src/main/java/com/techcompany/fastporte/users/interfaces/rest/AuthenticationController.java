@@ -24,15 +24,15 @@ public class AuthenticationController {
     @PostMapping("/authenticate")
     public ResponseEntity<TokenResource> createAuthenticationToken(@RequestBody LoginResource resource) {
         try {
-            String username = resource.username();
+            String email = resource.email();
             String password = resource.password();
 
-            String token = authenticationService.handle(new AuthenticateAccountCommand(username, password));
+            String token = authenticationService.handle(new AuthenticateAccountCommand(email, password));
 
             if (token == null) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new TokenResource(token));
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new TokenResource(null));
             } else {
-                return ResponseEntity.ok(new TokenResource(token));
+                return ResponseEntity.status(HttpStatus.OK).body(new TokenResource(token));
             }
 
         } catch (Exception e) {

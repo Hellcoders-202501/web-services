@@ -30,9 +30,10 @@ public class Driver implements Serializable {
     @JoinColumn(name = "supervisor_id")
     private Supervisor supervisor;
 
-    public Driver(RegisterDriverCommand command) {
+    public Driver(RegisterDriverCommand command, Supervisor supervisor) {
 
         this.user = new User(command);
+        this.supervisor = supervisor;
         //this.plate = command.plate();
     }
 }

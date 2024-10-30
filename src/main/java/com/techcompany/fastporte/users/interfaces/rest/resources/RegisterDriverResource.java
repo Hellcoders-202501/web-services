@@ -1,6 +1,7 @@
 package com.techcompany.fastporte.users.interfaces.rest.resources;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 public record RegisterDriverResource(
     @NotBlank(message = "The name is required") String name,
@@ -10,6 +11,7 @@ public record RegisterDriverResource(
     @NotBlank(message = "The phone is required") String phone,
     @NotBlank(message = "The username is required") String username,
     @NotBlank(message = "The password is required") String password,
+    @NotNull(message = "The supervisor is required") Long supervisorId,
     String plate
 ) {
 }

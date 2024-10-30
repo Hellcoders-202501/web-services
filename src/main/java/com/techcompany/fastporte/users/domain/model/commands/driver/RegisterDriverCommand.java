@@ -10,6 +10,7 @@ public record RegisterDriverCommand(
     String phone,
     String username,
     String password,
+    Long supervisorId,
     String plate) {
 
 }
