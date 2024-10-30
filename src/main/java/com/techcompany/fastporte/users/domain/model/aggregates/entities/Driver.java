@@ -22,7 +22,7 @@ public class Driver implements Serializable {
     @Column(name = "plate")
     private String plate;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id")
     private User user;
 
@@ -30,9 +30,10 @@ public class Driver implements Serializable {
     @JoinColumn(name = "supervisor_id")
     private Supervisor supervisor;
 
-    public Driver(RegisterDriverCommand command) {
+    public Driver(RegisterDriverCommand command, Supervisor supervisor) {
 
         this.user = new User(command);
+        this.supervisor = supervisor;
         //this.plate = command.plate();
     }
 }

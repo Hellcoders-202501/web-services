@@ -8,11 +8,14 @@ import com.techcompany.fastporte.users.domain.services.supervisor.SupervisorComm
 import com.techcompany.fastporte.users.domain.services.supervisor.SupervisorQueryService;
 import com.techcompany.fastporte.users.interfaces.rest.resources.RegisterSupervisorResource;
 import com.techcompany.fastporte.users.interfaces.rest.resources.SupervisorInformationResource;
+import com.techcompany.fastporte.users.interfaces.rest.resources.UpdateSupervisorInformationResource;
 import com.techcompany.fastporte.users.interfaces.rest.transform.fromEntity.SupervisorInformationResourceFromEntityAssembler;
 import com.techcompany.fastporte.users.interfaces.rest.transform.fromResource.RegisterSupervisorCommandFromResourceAssembler;
+import com.techcompany.fastporte.users.interfaces.rest.transform.fromResource.UpdateSupervisorInformationCommandFromResourceAssembler;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -31,7 +34,7 @@ public class SupervisorController {
         this.supervisorQueryService = supervisorQueryService;
     }
 
-    // @PreAuthorize("hasRole('ROLE_SUPERVISOR')")
+    @PreAuthorize("hasRole('ROLE_SUPERVISOR') or hasRole('ROLE_DRIVER') or hasRole('ROLE_ADMIN')")
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<SupervisorInformationResource> findById(@PathVariable Long id) {
 
@@ -46,7 +49,7 @@ public class SupervisorController {
         }
     }
 
-    // @PreAuthorize("hasRole('ROLE_SUPERVISOR')")
+    @PreAuthorize("hasRole('ROLE_SUPERVISOR') or hasRole('ROLE_DRIVER') or hasRole('ROLE_ADMIN')")
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<SupervisorInformationResource>> findAll() {
         try {
@@ -66,7 +69,6 @@ public class SupervisorController {
         }
     }
 
-    // @PreAuthorize("hasRole('ROLE_SUPERVISOR')")
     @PostMapping(value = "/register", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<SupervisorInformationResource> save(@RequestBody RegisterSupervisorResource resource) {
 
@@ -80,13 +82,22 @@ public class SupervisorController {
         }
     }
 
-    // @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_SUPERVISOR')")
+    @PutMapping(value = "/update", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<SupervisorInformationResource> update(@RequestBody UpdateSupervisorInformationResource resource) {
+
+        Optional<Supervisor> supervisor = supervisorCommandService.handle(UpdateSupervisorInformationCommandFromResourceAssembler.toCommandFromResource(resource));
+        return supervisor.map(value -> ResponseEntity.status(HttpStatus.CREATED).body(SupervisorInformationResourceFromEntityAssembler.toResourceFromEntity(value)))
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null));
+
+    }
+
+    @PreAuthorize("hasRole('ROLE_SUPERVISOR') or hasRole('ROLE_DRIVER') or hasRole('ROLE_ADMIN')")
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         try {
             if (supervisorQueryService.handle(new GetSupervisorByIdQuery(id)).isPresent()) {
                 supervisorCommandService.handle(new DeleteSupervisorCommand(id));
-                
+
                 return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
             } else {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
