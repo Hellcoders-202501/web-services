@@ -6,8 +6,7 @@ import com.techcompany.fastporte.trips.application.dtos.TripInformationDto;
 import com.techcompany.fastporte.trips.domain.model.aggregates.entities.Trip;
 import com.techcompany.fastporte.trips.domain.model.aggregates.entities.TripStatus;
 import com.techcompany.fastporte.trips.domain.model.aggregates.enums.Status;
-import com.techcompany.fastporte.trips.domain.model.commands.CreateTripCommand;
-import com.techcompany.fastporte.trips.domain.model.commands.DeleteTripCommand;
+import com.techcompany.fastporte.trips.domain.model.commands.*;
 import com.techcompany.fastporte.trips.domain.services.TripCommandService;
 import com.techcompany.fastporte.trips.infrastructure.acl.DriverAcl;
 import com.techcompany.fastporte.trips.infrastructure.acl.SupervisorAcl;
@@ -80,5 +79,23 @@ public class TripCommandServiceImp implements TripCommandService {
     @Override
     public void handle(DeleteTripCommand command) {
         tripRepository.deleteById(command.tripId());
+    }
+
+    @Override
+    public void handle(StartTripCommand command) {
+        Optional<TripStatus> tripStatus = tripStatusRepository.findByStatus(Status.IN_PROGRESS);
+        tripStatus.ifPresent(status -> tripRepository.updateStatusById(command.tripId(), status.getId()));
+    }
+
+    @Override
+    public void handle(FinishTripCommand command) {
+        Optional<TripStatus> tripStatus = tripStatusRepository.findByStatus(Status.FINISHED);
+        tripStatus.ifPresent(status -> tripRepository.updateStatusById(command.tripId(), status.getId()));
+    }
+
+    @Override
+    public void handle(CancelTripCommand command) {
+        Optional<TripStatus> tripStatus = tripStatusRepository.findByStatus(Status.CANCELED);
+        tripStatus.ifPresent(status -> tripRepository.updateStatusById(command.tripId(), status.getId()));
     }
 }
