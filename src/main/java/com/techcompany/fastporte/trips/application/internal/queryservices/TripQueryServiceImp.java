@@ -44,7 +44,7 @@ public class TripQueryServiceImp implements TripQueryService {
                TripInformationDto tripInformationDto = TripInformationDto.builder()
                           .tripId(trip.get().getId())
                           .driverId(driver.get().id())
-                          .driverName(driver.get().name() + " " + driver.get().firstLastName() + " " + driver.get().secondLastName())
+                          .driverName(driver.get().name())
                           .origin(trip.get().getOrigin())
                           .destination(trip.get().getDestination())
                           .startTime(trip.get().getStartTime())
