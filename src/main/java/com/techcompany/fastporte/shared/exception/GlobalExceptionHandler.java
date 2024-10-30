@@ -1,6 +1,7 @@
 package com.techcompany.fastporte.shared.exception;
 
 import com.techcompany.fastporte.users.domain.model.exceptions.EmailAlreadyExistsException;
+import com.techcompany.fastporte.users.domain.model.exceptions.InvalidCredentialsException;
 import com.techcompany.fastporte.users.domain.model.exceptions.SupervisorNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -37,5 +38,12 @@ public class GlobalExceptionHandler {
         Map<String, String> errors = new HashMap<>();
         errors.put("message", ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
+    }
+
+    @ExceptionHandler(InvalidCredentialsException.class)
+    public ResponseEntity<Map<String, String>> handleInvalidCredentialsException(InvalidCredentialsException ex) {
+        Map<String, String> errors = new HashMap<>();
+        errors.put("message", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errors);
     }
 }

@@ -4,6 +4,7 @@ import com.techcompany.fastporte.users.domain.model.aggregates.entities.Driver;
 import com.techcompany.fastporte.users.domain.model.aggregates.entities.Supervisor;
 import com.techcompany.fastporte.users.domain.model.aggregates.entities.User;
 import com.techcompany.fastporte.users.domain.model.aggregates.entities.UserDetailsImp;
+import com.techcompany.fastporte.users.domain.model.exceptions.InvalidCredentialsException;
 import com.techcompany.fastporte.users.infrastructure.persistence.jpa.DriverRepository;
 import com.techcompany.fastporte.users.infrastructure.persistence.jpa.SupervisorRepository;
 import com.techcompany.fastporte.users.infrastructure.persistence.jpa.UserRepository;
@@ -32,10 +33,10 @@ public class UserDetailsServiceImp implements UserDetailsService {
     /// This method is used to load user by username or email.
     /// In this case, we are using email as username.
     @Override
-    public UserDetailsImp loadUserByUsername(String email) {
+    public UserDetailsImp loadUserByUsername(String username) {
 
         //Find user by email
-        Optional<User> user = userRepository.findByEmail(email);
+        Optional<User> user = userRepository.findByEmail(username);
 
         //Find user by username
         //Optional<User> driver = userRepository.findByUsername(username);
@@ -44,6 +45,7 @@ public class UserDetailsServiceImp implements UserDetailsService {
 
             //Username or email:
             String _username = user.get().getEmail();
+            //String _username = user.get().getUsername();
 
             String _password = user.get().getPassword();
 
@@ -66,11 +68,10 @@ public class UserDetailsServiceImp implements UserDetailsService {
 
             //Set first argument if you want to use email as username
             //return new UserDetailsImp(user.get().getEmail(), user.get().getPassword(), user.get().getId(), authorities);
+            throw new InvalidCredentialsException();
+
+        } else {
+            throw new InvalidCredentialsException();
         }
-
-        System.out.println("Email: " + email + "Not found in users table");
-
-        return new UserDetailsImp();
-
     }
 }

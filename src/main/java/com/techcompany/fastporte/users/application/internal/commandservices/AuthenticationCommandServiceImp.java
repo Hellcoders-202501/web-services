@@ -27,20 +27,14 @@ public class AuthenticationCommandServiceImp implements AuthenticationCommandSer
 
     @Override
     public String handle(AuthenticateAccountCommand command) {
-        try {
-            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(command.email(), command.password()));
-            final UserDetailsImp userDetails = (UserDetailsImp) userDetailsService.loadUserByUsername(command.email()); //En este caso es email
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(command.username(), command.password()));
+        final UserDetailsImp userDetails = (UserDetailsImp) userDetailsService.loadUserByUsername(command.username());
 
-            String role = userDetails.getAuthorities().stream()
-                    .findFirst()
-                    .map(GrantedAuthority::getAuthority)
-                    .orElse("ROLE_USER");
+        String role = userDetails.getAuthorities().stream()
+                .findFirst()
+                .map(GrantedAuthority::getAuthority)
+                .orElse("");
 
-            return jwtUtil.generateToken(userDetails.getUsername(), userDetails.getUserId(), role);
-
-        } catch (Exception e) {
-            System.out.println("User not found: " + e.getMessage());
-            return null;
-        }
+        return jwtUtil.generateToken(userDetails.getUsername(), userDetails.getUserId(), role);
     }
 }
