@@ -1,5 +1,6 @@
 package com.techcompany.fastporte.shared.exception;
 
+import com.techcompany.fastporte.users.domain.model.exceptions.DriverNotFoundException;
 import com.techcompany.fastporte.users.domain.model.exceptions.EmailAlreadyExistsException;
 import com.techcompany.fastporte.users.domain.model.exceptions.InvalidCredentialsException;
 import com.techcompany.fastporte.users.domain.model.exceptions.SupervisorNotFoundException;
@@ -28,6 +29,13 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(SupervisorNotFoundException.class)
     public ResponseEntity<Map<String, String>> handleSupervisorNotFoundException(SupervisorNotFoundException ex) {
+        Map<String, String> errors = new HashMap<>();
+        errors.put("message", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errors);
+    }
+
+    @ExceptionHandler(DriverNotFoundException.class)
+    public ResponseEntity<Map<String, String>> handleDriverNotFoundException(DriverNotFoundException ex) {
         Map<String, String> errors = new HashMap<>();
         errors.put("message", ex.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errors);

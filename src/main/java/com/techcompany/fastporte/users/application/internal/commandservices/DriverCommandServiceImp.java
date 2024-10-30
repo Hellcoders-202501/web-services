@@ -7,6 +7,8 @@ import com.techcompany.fastporte.users.domain.model.aggregates.entities.User;
 import com.techcompany.fastporte.users.domain.model.aggregates.enums.RoleName;
 import com.techcompany.fastporte.users.domain.model.commands.driver.DeleteDriverCommand;
 import com.techcompany.fastporte.users.domain.model.commands.driver.RegisterDriverCommand;
+import com.techcompany.fastporte.users.domain.model.commands.driver.UpdateDriverInformationCommand;
+import com.techcompany.fastporte.users.domain.model.exceptions.DriverNotFoundException;
 import com.techcompany.fastporte.users.domain.model.exceptions.EmailAlreadyExistsException;
 import com.techcompany.fastporte.users.domain.model.exceptions.RoleNotFoundException;
 import com.techcompany.fastporte.users.domain.model.exceptions.SupervisorNotFoundException;
@@ -81,6 +83,24 @@ public class DriverCommandServiceImp implements DriverCommandService {
 
         //return driverMapper.driverToResponseDto(savedDriver);
         return Optional.of(savedDriver);
+    }
+
+    @Override
+    public Optional<Driver> handle(UpdateDriverInformationCommand command) {
+        Driver driver = driverRepository.findById(command.id())
+                .orElseThrow(() -> new DriverNotFoundException(command.id()));
+
+        User user = userRepository.findById(driver.getUser().getId())
+                .orElseThrow(() -> new DriverNotFoundException(command.id()));
+
+        user.setName(command.name());
+        user.setFirstLastName(command.firstLastName());
+        user.setSecondLastName(command.secondLastName());
+        user.setEmail(command.email());
+        user.setPassword(passwordEncoder.encode(command.password()));
+        user.setPhone(command.phone());
+
+        return Optional.of(driverRepository.save(driver));
     }
 
     @Override

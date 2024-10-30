@@ -11,8 +11,10 @@ import com.techcompany.fastporte.users.domain.services.driver.DriverCommandServi
 import com.techcompany.fastporte.users.domain.services.driver.DriverQueryService;
 import com.techcompany.fastporte.users.interfaces.rest.resources.DriverInformationResource;
 import com.techcompany.fastporte.users.interfaces.rest.resources.RegisterDriverResource;
+import com.techcompany.fastporte.users.interfaces.rest.resources.UpdateDriverInformationResource;
 import com.techcompany.fastporte.users.interfaces.rest.transform.fromEntity.DriverInformationResourceFromEntityAssembler;
 import com.techcompany.fastporte.users.interfaces.rest.transform.fromResource.RegisterDriverCommandFromResourceAssembler;
+import com.techcompany.fastporte.users.interfaces.rest.transform.fromResource.UpdateDriverInformationCommandFromResourceAssembler;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -113,6 +115,15 @@ public class DriverController {
         Optional<Driver> driver = driverCommandService.handle(RegisterDriverCommandFromResourceAssembler.toCommandFromResource(resource));
         return driver.map(DriverInformationResourceFromEntityAssembler::toPublicResourceFromEntity)
                 .map(driverInformationResource -> ResponseEntity.status(HttpStatus.CREATED).body(driverInformationResource))
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null));
+    }
+
+    @PutMapping(value = "/update", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> update(@Valid @RequestBody UpdateDriverInformationResource resource) {
+
+        Optional<Driver> driver = driverCommandService.handle(UpdateDriverInformationCommandFromResourceAssembler.toCommandFromResource(resource));
+        return driver.map(DriverInformationResourceFromEntityAssembler::toPublicResourceFromEntity)
+                .map(driverInformationResource -> ResponseEntity.status(HttpStatus.OK).body(driverInformationResource))
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null));
     }
 
