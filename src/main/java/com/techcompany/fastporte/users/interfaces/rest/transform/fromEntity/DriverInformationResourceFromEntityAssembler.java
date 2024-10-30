@@ -8,24 +8,26 @@ public class DriverInformationResourceFromEntityAssembler {
     public static DriverInformationResource toPublicResourceFromEntity(Driver driver) {
         return new DriverInformationResource(
                 driver.getId(),
-                driver.getUser().getName(),
-                driver.getUser().getFirstLastName(),
-                driver.getUser().getSecondLastName(),
+                driver.getUser().getName() + " " + driver.getUser().getFirstLastName() + " " + driver.getUser().getSecondLastName(),
+//                driver.getUser().getFirstLastName(),
+//                driver.getUser().getSecondLastName(),
                 driver.getUser().getEmail(),
                 driver.getUser().getPhone(),
-                driver.getUser().getUsername()
+                driver.getUser().getUsername(),
+                driver.getSupervisor().getId()
         );
     }
 
     public static DriverInformationResource toPrivateResourceFromEntity(Driver driver) {
         return new DriverInformationResource(
                 driver.getId(),
-                driver.getUser().getName(),
-                driver.getUser().getFirstLastName(),
-                driver.getUser().getSecondLastName(),
+                driver.getUser().getName() + " " + driver.getUser().getFirstLastName() + " " + driver.getUser().getSecondLastName(),
+//                driver.getUser().getFirstLastName(),
+//                driver.getUser().getSecondLastName(),
                 driver.getUser().getEmail(),
                 driver.getUser().getPhone(),
-                driver.getUser().getUsername()
+                driver.getUser().getUsername(),
+                driver.getSupervisor().getId()
                 //ToDo: Add more fields
         );
     }

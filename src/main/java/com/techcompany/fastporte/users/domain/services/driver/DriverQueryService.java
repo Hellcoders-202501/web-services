@@ -10,6 +10,7 @@ public interface DriverQueryService {
     Optional<Driver> handle(GetDriverByIdQuery query);
     List<Driver> handle(GetAllDriversQuery query);
     List<Driver> handle(GetAllDriversByIdInList query);
+    List<Driver> handle(GetAllDriversBySupervisorIdQuery query);
 
     Optional<Driver> handle(GetDriverPrivateProfileQuery query);
     Optional<Driver> handle(GetDriverPublicProfileQuery query);

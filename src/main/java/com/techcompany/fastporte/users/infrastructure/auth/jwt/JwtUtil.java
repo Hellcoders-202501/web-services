@@ -43,6 +43,8 @@ public class JwtUtil {
         return extractExpiration(token).before(new Date());
     }
 
+    /// Generate token
+    /// userId: Could be the driverId or the supervisorId
     public String generateToken(String username, Long userId, String role) {
         Map<String, Object> claims = new HashMap<>();
         return createToken(claims, username, userId, role);

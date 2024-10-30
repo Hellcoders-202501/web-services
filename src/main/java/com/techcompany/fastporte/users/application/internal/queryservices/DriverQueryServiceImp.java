@@ -36,6 +36,11 @@ public class DriverQueryServiceImp implements DriverQueryService {
     }
 
     @Override
+    public List<Driver> handle(GetAllDriversBySupervisorIdQuery query) {
+        return driverRepository.findAllBySupervisor_Id(query.supervisorId());
+    }
+
+    @Override
     public Optional<Driver> handle(GetDriverPrivateProfileQuery query) {
         return driverRepository.findById(query.id());
     }

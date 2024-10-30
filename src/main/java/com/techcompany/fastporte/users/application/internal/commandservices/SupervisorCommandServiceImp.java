@@ -1,11 +1,16 @@
 package com.techcompany.fastporte.users.application.internal.commandservices;
 
+import com.techcompany.fastporte.users.domain.model.aggregates.entities.Driver;
 import com.techcompany.fastporte.users.domain.model.aggregates.entities.Role;
 import com.techcompany.fastporte.users.domain.model.aggregates.entities.Supervisor;
 import com.techcompany.fastporte.users.domain.model.aggregates.entities.User;
 import com.techcompany.fastporte.users.domain.model.aggregates.enums.RoleName;
+import com.techcompany.fastporte.users.domain.model.commands.driver.UpdateDriverInformationCommand;
 import com.techcompany.fastporte.users.domain.model.commands.supervisor.DeleteSupervisorCommand;
 import com.techcompany.fastporte.users.domain.model.commands.supervisor.RegisterSupervisorCommand;
+import com.techcompany.fastporte.users.domain.model.commands.supervisor.UpdateSupervisorInformationCommand;
+import com.techcompany.fastporte.users.domain.model.exceptions.DriverNotFoundException;
+import com.techcompany.fastporte.users.domain.model.exceptions.SupervisorNotFoundException;
 import com.techcompany.fastporte.users.domain.services.supervisor.SupervisorCommandService;
 import com.techcompany.fastporte.users.infrastructure.persistence.jpa.RoleRepository;
 import com.techcompany.fastporte.users.infrastructure.persistence.jpa.SupervisorRepository;
@@ -59,6 +64,24 @@ public class SupervisorCommandServiceImp implements SupervisorCommandService {
 
         //return supervisorMapper.supervisorToResponseDto(savedSupervisor);
         return Optional.of(savedSupervisor);
+    }
+
+    @Override
+    public Optional<Supervisor> handle(UpdateSupervisorInformationCommand command) {
+        Supervisor supervisor = supervisorRepository.findById(command.id())
+                .orElseThrow(() -> new SupervisorNotFoundException(command.id()));
+
+        User user = userRepository.findById(supervisor.getUser().getId())
+                .orElseThrow(() -> new DriverNotFoundException(command.id()));
+
+        user.setName(command.name());
+        user.setFirstLastName(command.firstLastName());
+        user.setSecondLastName(command.secondLastName());
+        user.setEmail(command.email());
+        user.setPassword(passwordEncoder.encode(command.password()));
+        user.setPhone(command.phone());
+
+        return Optional.of(supervisorRepository.save(supervisor));
     }
 
     @Override
