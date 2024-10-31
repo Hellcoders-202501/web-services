@@ -72,14 +72,10 @@ public class SupervisorController {
     @PostMapping(value = "/register", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<SupervisorInformationResource> save(@RequestBody RegisterSupervisorResource resource) {
 
-        try {
-            Optional<Supervisor> supervisor = supervisorCommandService.handle(RegisterSupervisorCommandFromResourceAssembler.toCommandFromResource(resource));
-            return supervisor.map(value -> ResponseEntity.status(HttpStatus.CREATED).body(SupervisorInformationResourceFromEntityAssembler.toResourceFromEntity(value)))
-                    .orElseGet(() -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null));
-
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-        }
+        Optional<Supervisor> supervisor = supervisorCommandService.handle(RegisterSupervisorCommandFromResourceAssembler.toCommandFromResource(resource));
+        return supervisor.map(SupervisorInformationResourceFromEntityAssembler::toResourceFromEntity)
+                .map(supervisorInformationResource -> ResponseEntity.status(HttpStatus.CREATED).body(supervisorInformationResource))
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null));
     }
 
     @PutMapping(value = "/update", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
