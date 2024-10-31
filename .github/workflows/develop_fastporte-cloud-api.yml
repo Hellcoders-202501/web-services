@@ -48,6 +48,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: java-app
+          path: . # Esto descarga el artefacto en el directorio de trabajo actual
 
       - name: Login to Azure
         uses: azure/login@v2
@@ -62,4 +63,4 @@ jobs:
         with:
           app-name: 'fastporte-cloud-api'
           slot-name: 'Production'
-          package: 'java-app/*.jar'
+          package: '*.jar' # Ahora apuntamos al archivo .jar en el directorio actual
