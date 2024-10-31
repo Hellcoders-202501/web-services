@@ -6,7 +6,7 @@ name: Build and deploy JAR app to Azure Web App - fastporte-cloud-api
 on:
   push:
     branches:
-      - main
+      - develop
   workflow_dispatch:
 
 jobs:
