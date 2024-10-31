@@ -6,7 +6,7 @@ name: Build and deploy JAR app to Azure Web App - fastporte-cloud-api
 on:
   push:
     branches:
-      - develop
+      - main
   workflow_dispatch:
 
 jobs:
@@ -22,14 +22,17 @@ jobs:
           java-version: '17'
           distribution: 'microsoft'
 
-      - name: Build with Maven
-        run: mvn clean install
+      - name: Grant execute permission for gradlew
+        run: chmod +x ./gradlew
+
+      - name: Build with Gradle
+        run: ./gradlew bootJar -x test
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: java-app
-          path: '${{ github.workspace }}/target/*.jar'
+          path: 'build/libs/*.jar'
 
   deploy:
     runs-on: ubuntu-latest
@@ -38,20 +41,20 @@ jobs:
       name: 'Production'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
     permissions:
-      id-token: write #This is required for requesting the JWT
+      id-token: write # This is required for requesting the JWT
   
     steps:
       - name: Download artifact from build job
         uses: actions/download-artifact@v4
         with:
           name: java-app
-      
+
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_059D91DA6FA64C84BE28CE808AA91591 }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_42F28B18258F40BDA4A79B51BFB8F502 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_C5B93701EC8B47DB9DF30546BC8DC07B }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_2FABCF320AC0436283A4480F4CBBD1A1 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_99C175D136634B3586EAD3844E32F4B7 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_3DC2222127D44E3F8695D56EA282558D }}
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
@@ -59,5 +62,4 @@ jobs:
         with:
           app-name: 'fastporte-cloud-api'
           slot-name: 'Production'
-          package: '*.jar'
-          
+          package: 'java-app/*.jar'
