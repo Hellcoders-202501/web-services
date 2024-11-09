@@ -12,6 +12,7 @@ import com.techcompany.fastporte.users.interfaces.rest.resources.UpdateSuperviso
 import com.techcompany.fastporte.users.interfaces.rest.transform.fromEntity.SupervisorInformationResourceFromEntityAssembler;
 import com.techcompany.fastporte.users.interfaces.rest.transform.fromResource.RegisterSupervisorCommandFromResourceAssembler;
 import com.techcompany.fastporte.users.interfaces.rest.transform.fromResource.UpdateSupervisorInformationCommandFromResourceAssembler;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -70,7 +71,7 @@ public class SupervisorController {
     }
 
     @PostMapping(value = "/register", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<SupervisorInformationResource> save(@RequestBody RegisterSupervisorResource resource) {
+    public ResponseEntity<SupervisorInformationResource> save(@Valid @RequestBody RegisterSupervisorResource resource) {
 
         Optional<Supervisor> supervisor = supervisorCommandService.handle(RegisterSupervisorCommandFromResourceAssembler.toCommandFromResource(resource));
         return supervisor.map(SupervisorInformationResourceFromEntityAssembler::toResourceFromEntity)
@@ -79,7 +80,7 @@ public class SupervisorController {
     }
 
     @PutMapping(value = "/update", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<SupervisorInformationResource> update(@RequestBody UpdateSupervisorInformationResource resource) {
+    public ResponseEntity<SupervisorInformationResource> update(@Valid @RequestBody UpdateSupervisorInformationResource resource) {
 
         Optional<Supervisor> supervisor = supervisorCommandService.handle(UpdateSupervisorInformationCommandFromResourceAssembler.toCommandFromResource(resource));
         return supervisor.map(value -> ResponseEntity.status(HttpStatus.CREATED).body(SupervisorInformationResourceFromEntityAssembler.toResourceFromEntity(value)))

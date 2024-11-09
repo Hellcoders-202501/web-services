@@ -12,7 +12,8 @@ public class RegisterSupervisorCommandFromResourceAssembler {
                 resource.email(),
                 resource.phone(),
                 resource.username(),
-                resource.password()
+                resource.password(),
+                resource.sensorCode()
         );
     }
 }

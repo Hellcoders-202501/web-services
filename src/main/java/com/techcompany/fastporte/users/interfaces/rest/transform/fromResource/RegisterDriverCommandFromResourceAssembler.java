@@ -14,7 +14,8 @@ public class RegisterDriverCommandFromResourceAssembler {
                 resource.username(),
                 resource.password(),
                 resource.supervisorId(),
-                resource.plate()
+                resource.plate(),
+                resource.sensorCode()
         );
     }
 }

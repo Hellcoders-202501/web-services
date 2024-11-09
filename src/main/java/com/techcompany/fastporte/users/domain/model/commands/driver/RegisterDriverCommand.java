@@ -11,6 +11,8 @@ public record RegisterDriverCommand(
     String username,
     String password,
     Long supervisorId,
-    String plate) {
+    String plate,
+    String sensorCode
+    ) {
 
 }
