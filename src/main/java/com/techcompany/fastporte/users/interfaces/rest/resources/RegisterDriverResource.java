@@ -11,7 +11,7 @@ public record RegisterDriverResource(
     @NotBlank(message = "The phone is required") String phone,
     @NotBlank(message = "The username is required") String username,
     @NotBlank(message = "The password is required") String password,
-    @NotNull(message = "The supervisor is required") Long supervisorId,
+    //@NotNull(message = "The supervisor is required") Long supervisorId,
     String plate,
     @NotBlank(message = "The sensor code is required") String sensorCode
 ) {

@@ -45,18 +45,19 @@ public class DriverCommandServiceImp implements DriverCommandService {
             throw new EmailAlreadyExistsException(command.email());
         }
 
-        Supervisor supervisor = null;
+        /*Supervisor supervisor = null;
 
         /// Search if the supervisor exists
         if (command.supervisorId() != null) {
             supervisor = supervisorRepository.findById(command.supervisorId())
                     .orElseThrow(() -> new SupervisorNotFoundException(command.supervisorId()));
-        }
+        }*/
 
         /// Check if the sensor_code exists
         if (!sensorCodeRepository.existsByCode(command.sensorCode())) {
             throw new SensorCodeNotFoundException(command.sensorCode());
         }
+
 
         /// Check if the sensor_code has five drivers assigned
         List<SensorCode> availableSensorCodes  = sensorCodeRepository.findByCodeAndDriverIsNull(command.sensorCode());
@@ -65,6 +66,8 @@ public class DriverCommandServiceImp implements DriverCommandService {
             throw new LimitDriverBySensorCodeException(command.sensorCode());
         }
 
+        SensorCode sensorCodeToAssign = availableSensorCodes.get(0);
+        Supervisor supervisor = sensorCodeToAssign.getSupervisor();
         /// Create the driver object
         Driver driver = new Driver(command, supervisor);
 
@@ -88,7 +91,6 @@ public class DriverCommandServiceImp implements DriverCommandService {
         Driver savedDriver = driverRepository.save(driver);
 
         /// Assign the driver to the sensor code
-        SensorCode sensorCodeToAssign = availableSensorCodes.get(0);
         sensorCodeToAssign.setDriver(savedDriver);
         sensorCodeRepository.save(sensorCodeToAssign);
 
