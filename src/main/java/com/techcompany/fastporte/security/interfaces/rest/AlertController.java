@@ -9,6 +9,8 @@ import com.techcompany.fastporte.security.interfaces.rest.resources.AlertInforma
 import com.techcompany.fastporte.security.interfaces.rest.resources.CreateAlertResource;
 import com.techcompany.fastporte.security.interfaces.rest.transform.fromEntity.AlertInformationResourceFromEntityAssembler;
 import com.techcompany.fastporte.security.interfaces.rest.transform.fromResource.CreateAlertCommandFromResourceAssembler;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +21,8 @@ import java.util.Optional;
 
 @CrossOrigin
 @RestController
-@RequestMapping("/api/alerts")
+@RequestMapping("/api/v1/alerts")
+@Tag(name = "Alert Management", description = "Operations for managing alerts, including creation and retrieval by trip")
 public class AlertController {
 
     private final AlertCommandService alertCommandService;
@@ -30,6 +33,7 @@ public class AlertController {
         this.alertQueryService = alertQueryService;
     }
 
+    @Operation(summary = "Get alerts by trip ID", description = "Retrieves all alerts associated with the specified trip ID.")
     @GetMapping("/trip/{tripId}")
     public ResponseEntity<List<AlertInformationResource>> getAlertsByTripId(@PathVariable Long tripId) {
         try {
@@ -51,6 +55,7 @@ public class AlertController {
         }
     }
 
+    @Operation(summary = "Create an alert", description = "Creates a new alert associated with a trip.")
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<AlertInformationResource> createAlert(@RequestBody CreateAlertResource createAlertResource) {
         try {

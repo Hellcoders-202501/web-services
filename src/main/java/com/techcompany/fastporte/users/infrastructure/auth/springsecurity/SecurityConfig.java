@@ -23,9 +23,9 @@ public class SecurityConfig {
     private final RequestFilter requestFilter;
 
     private static final String[] WHITE_LIST_URL = {
-            "/authenticate",
-            "/api/drivers/register/**",
-            "/api/supervisors/register/**",
+            "/api/v1/auth",
+            "/api/v1/drivers/**",
+            "/api/v1/supervisors/**",
             "/v3/api-docs/**",
             "/swagger-ui/**",
             "/swagger-ui.html",

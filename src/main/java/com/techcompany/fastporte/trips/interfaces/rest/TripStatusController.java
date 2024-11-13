@@ -5,6 +5,8 @@ import com.techcompany.fastporte.trips.domain.model.queries.GetAllTripStatusQuer
 import com.techcompany.fastporte.trips.domain.services.TripStatusQueryService;
 import com.techcompany.fastporte.trips.interfaces.rest.resources.TripStatusResource;
 import com.techcompany.fastporte.trips.interfaces.rest.transform.fromEntity.TripStatusResourceFromEntityAssembler;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +19,8 @@ import java.util.List;
 
 @CrossOrigin
 @RestController
-@RequestMapping("/api/trip-status")
+@RequestMapping("/api/v1/trip-status")
+@Tag(name = "Trip Status Management", description = "Operations for retrieving trip statuses")
 public class TripStatusController {
 
     private final TripStatusQueryService tripStatusQueryService;
@@ -26,6 +29,7 @@ public class TripStatusController {
         this.tripStatusQueryService = tripStatusQueryService;
     }
 
+    @Operation(summary = "Get all trip statuses", description = "Retrieves a list of all possible statuses for trips.")
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<TripStatusResource>> getAllTripStatus() {
         try{
