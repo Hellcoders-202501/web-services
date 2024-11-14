@@ -127,7 +127,7 @@ public class DriverController {
 
     @Operation(summary = "Update driver information", description = "Updates the details of a driver.")
     @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> update(@Valid @RequestBody UpdateDriverInformationResource resource) {
+    public ResponseEntity<?> update(@RequestBody UpdateDriverInformationResource resource) {
 
         Optional<Driver> driver = driverCommandService.handle(UpdateDriverInformationCommandFromResourceAssembler.toCommandFromResource(resource));
         return driver.map(DriverInformationResourceFromEntityAssembler::toPublicResourceFromEntity)

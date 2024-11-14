@@ -94,7 +94,7 @@ public class SupervisorController {
 
     @Operation(summary = "Update supervisor information", description = "Updates the details of a supervisor.")
     @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<SupervisorInformationResource> update(@Valid @RequestBody UpdateSupervisorInformationResource resource) {
+    public ResponseEntity<SupervisorInformationResource> update(@RequestBody UpdateSupervisorInformationResource resource) {
 
         Optional<Supervisor> supervisor = supervisorCommandService.handle(UpdateSupervisorInformationCommandFromResourceAssembler.toCommandFromResource(resource));
         return supervisor.map(value -> ResponseEntity.status(HttpStatus.CREATED).body(SupervisorInformationResourceFromEntityAssembler.toResourceFromEntity(value)))
