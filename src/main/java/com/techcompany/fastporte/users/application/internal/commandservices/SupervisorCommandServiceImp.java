@@ -98,7 +98,6 @@ public class SupervisorCommandServiceImp implements SupervisorCommandService {
         user.setFirstLastName(command.firstLastName());
         user.setSecondLastName(command.secondLastName());
         user.setEmail(command.email());
-        user.setPassword(passwordEncoder.encode(command.password()));
         user.setPhone(command.phone());
 
         return Optional.of(supervisorRepository.save(supervisor));

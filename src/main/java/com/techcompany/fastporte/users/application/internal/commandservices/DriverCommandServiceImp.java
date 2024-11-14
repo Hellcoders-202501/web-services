@@ -109,7 +109,6 @@ public class DriverCommandServiceImp implements DriverCommandService {
         user.setFirstLastName(command.firstLastName());
         user.setSecondLastName(command.secondLastName());
         user.setEmail(command.email());
-        user.setPassword(passwordEncoder.encode(command.password()));
         user.setPhone(command.phone());
 
         return Optional.of(driverRepository.save(driver));

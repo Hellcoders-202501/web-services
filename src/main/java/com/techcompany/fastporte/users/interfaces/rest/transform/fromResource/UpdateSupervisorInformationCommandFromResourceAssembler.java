@@ -11,7 +11,6 @@ public class UpdateSupervisorInformationCommandFromResourceAssembler {
                 resource.firstLastName(),
                 resource.secondLastName(),
                 resource.email(),
-                resource.password(),
                 resource.phone()
         );
     }

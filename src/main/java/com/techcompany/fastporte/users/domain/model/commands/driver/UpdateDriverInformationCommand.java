@@ -6,7 +6,6 @@ public record UpdateDriverInformationCommand(
         String firstLastName,
         String secondLastName,
         String email,
-        String password,
         String phone
 ) {
 }
