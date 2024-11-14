@@ -7,7 +7,8 @@ public record SupervisorInformationResource(
     String secondLastName,
     String email,
     String phone,
-    String username
+    String username,
+    Long userId
 )
 {
 }

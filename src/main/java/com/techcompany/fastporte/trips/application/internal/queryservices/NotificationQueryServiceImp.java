@@ -1,6 +1,8 @@
 package com.techcompany.fastporte.trips.application.internal.queryservices;
 
 import com.techcompany.fastporte.trips.domain.model.aggregates.entities.Notification;
+import com.techcompany.fastporte.trips.domain.model.queries.GetAllNotificationsByUserIdQuery;
+import com.techcompany.fastporte.trips.domain.model.queries.GetUnreadNotificationsByUserIdQuery;
 import com.techcompany.fastporte.trips.domain.services.NotificationQueryService;
 import com.techcompany.fastporte.trips.infrastructure.persistence.jpa.NotificationRepository;
 import org.springframework.stereotype.Service;
@@ -17,12 +19,12 @@ public class NotificationQueryServiceImp implements NotificationQueryService {
     }
 
     @Override
-    public List<Notification> getNotificationsByUserId(Long userId) {
-        return notificationRepository.findAllByUserId(userId);
+    public List<Notification> handle(GetAllNotificationsByUserIdQuery query) {
+        return notificationRepository.findAllByUserId(query.userId());
     }
 
     @Override
-    public List<Notification> getUnreadNotificationsByUserId(Long userId) {
-        return notificationRepository.findAllByUserIdAndSeen(userId, false);
+    public List<Notification> handle(GetUnreadNotificationsByUserIdQuery query) {
+        return notificationRepository.findAllByUserIdAndSeen(query.userId(), false);
     }
 }

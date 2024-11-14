@@ -1,5 +1,6 @@
 package com.techcompany.fastporte.trips.domain.model.aggregates.entities;
 
+import com.techcompany.fastporte.trips.application.dtos.NotificationDto;
 import com.techcompany.fastporte.trips.domain.model.aggregates.enums.NotificationType;
 import com.techcompany.fastporte.users.domain.model.aggregates.entities.User;
 import jakarta.persistence.*;
@@ -40,5 +41,16 @@ public class Notification implements Serializable {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "trip_id")
     private Trip trip;
+
+    public NotificationDto toDto() {
+        return new NotificationDto(
+                id,
+                timestamp,
+                type,
+                seen,
+                user.getId(),
+                trip != null ? trip.getId() : null
+        );
+    }
 
 }

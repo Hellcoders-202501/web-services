@@ -1,4 +1,4 @@
-package com.techcompany.fastporte.trips.interfaces.websocket;
+package com.techcompany.fastporte.trips.infrastructure.websocket;
 
 import com.techcompany.fastporte.users.domain.model.aggregates.enums.RoleName;
 import com.techcompany.fastporte.users.infrastructure.auth.jwt.JwtUtil;
@@ -87,18 +87,11 @@ public class NotificationWebSocketHandler extends TextWebSocketHandler {
             throw new RuntimeException("Error: No se pudo obtener el rol del token");
         }
 
-        System.out.println("----------- userId: " + userId);
-        System.out.println("----------- role: " + role);
-
         if (role.equals(RoleName.ROLE_DRIVER)) {
-            Long driverId = driverRepository.findById(userId).get().getUser().getId();
-            System.out.println("----------- driverId user: " + driverId);
-            return driverId;
+            return driverRepository.findById(userId).get().getUser().getId();
 
         } else if (role.equals(RoleName.ROLE_SUPERVISOR)) {
-            Long supervisorId = supervisorRepository.findById(userId).get().getUser().getId();
-            System.out.println("----------- supervisorId user: " + supervisorId);
-            return supervisorId;
+            return supervisorRepository.findById(userId).get().getUser().getId();
         } else {
             throw new RuntimeException("Error: El rol del usuario no es válido");
 

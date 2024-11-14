@@ -16,7 +16,7 @@ import com.techcompany.fastporte.trips.infrastructure.acl.SupervisorAcl;
 import com.techcompany.fastporte.trips.infrastructure.persistence.jpa.NotificationRepository;
 import com.techcompany.fastporte.trips.infrastructure.persistence.jpa.TripRepository;
 import com.techcompany.fastporte.trips.infrastructure.persistence.jpa.TripStatusRepository;
-import com.techcompany.fastporte.trips.interfaces.websocket.NotificationWebSocketHandler;
+import com.techcompany.fastporte.trips.infrastructure.websocket.NotificationWebSocketHandler;
 import com.techcompany.fastporte.users.domain.model.aggregates.entities.Driver;
 import com.techcompany.fastporte.users.domain.model.aggregates.entities.Supervisor;
 import com.techcompany.fastporte.users.domain.model.aggregates.enums.RoleName;
@@ -162,12 +162,11 @@ public class TripCommandServiceImp implements TripCommandService {
             // Enviar notificación en tiempo real al conductor
             Long driverUserId = driver.get().getUser().getId();
             RoleName role = driver.get().getUser().getRoles().stream().findFirst().get().getRoleName();
-            System.out.println("Driver user id: " + driverUserId);
+
             if (webSocketHandler.isUserConnected(driverUserId, role)) {
                 try {
-                    String notificationJson = objectMapper.writeValueAsString(notification);
+                    String notificationJson = objectMapper.writeValueAsString(notification.toDto());
                     webSocketHandler.sendNotification(notificationJson, driverUserId);
-                    System.out.println("Notification sent to driver");
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -189,14 +188,11 @@ public class TripCommandServiceImp implements TripCommandService {
             // Enviar notificación en tiempo real al supervisor
             Long supervisorUserId = supervisor.get().getUser().getId();
             RoleName role = supervisor.get().getUser().getRoles().stream().findFirst().get().getRoleName();
-            System.out.println("Supervisor user id: " + supervisorUserId);
-            System.out.println("Role: " + role);
+
             if (webSocketHandler.isUserConnected(supervisorUserId, role)) {
-                System.out.println("User is connected.....");
                 try {
-                    String notificationJson = objectMapper.writeValueAsString(notification);
+                    String notificationJson = objectMapper.writeValueAsString(notification.toDto());
                     webSocketHandler.sendNotification(notificationJson, supervisorUserId);
-                    System.out.println("Notification sent to supervisor");
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

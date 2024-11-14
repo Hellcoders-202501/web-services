@@ -1,4 +1,4 @@
-package com.techcompany.fastporte.trips.interfaces.websocket;
+package com.techcompany.fastporte.trips.infrastructure.websocket;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;

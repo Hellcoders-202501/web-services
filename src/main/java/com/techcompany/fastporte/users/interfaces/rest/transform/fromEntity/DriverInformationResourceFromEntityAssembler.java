@@ -14,7 +14,8 @@ public class DriverInformationResourceFromEntityAssembler {
                 driver.getUser().getEmail(),
                 driver.getUser().getPhone(),
                 driver.getUser().getUsername(),
-                driver.getSupervisor().getId()
+                driver.getSupervisor().getId(),
+                driver.getUser().getId()
         );
     }
 
@@ -27,7 +28,8 @@ public class DriverInformationResourceFromEntityAssembler {
                 driver.getUser().getEmail(),
                 driver.getUser().getPhone(),
                 driver.getUser().getUsername(),
-                driver.getSupervisor().getId()
+                driver.getSupervisor().getId(),
+                driver.getUser().getId()
                 //ToDo: Add more fields
         );
     }
