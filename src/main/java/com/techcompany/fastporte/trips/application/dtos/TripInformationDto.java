@@ -12,8 +12,10 @@ public class TripInformationDto {
     private Long tripId;
     private Long driverId;
     private String driverName;
+    private String driverPhoneNumber;
     private Long supervisorId;
     private String supervisorName;
+    private String supervisorPhoneNumber;
     private String origin;
     private String destination;
     private String startTime;
