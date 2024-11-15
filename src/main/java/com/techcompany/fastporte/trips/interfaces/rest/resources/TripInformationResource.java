@@ -10,8 +10,14 @@ public record TripInformationResource(
         String supervisorPhoneNumber,
         String origin,
         String destination,
+        String type,
+        String amount,
+        String weight,
+        String date,
         String startTime,
         String endTime,
+        String subject,
+        String description,
         String status
 ) {
 }

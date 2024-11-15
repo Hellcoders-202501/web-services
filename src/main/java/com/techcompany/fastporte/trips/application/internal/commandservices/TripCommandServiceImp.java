@@ -67,6 +67,11 @@ public class TripCommandServiceImp implements TripCommandService {
         Optional<Supervisor> supervisor = supervisorRepository.findById(command.supervisorId());
 
         if (driver.isPresent() && supervisor.isPresent()) {
+
+            // Asignar el conductor y el supervisor al viaje
+            trip.assignDriver(driver.get());
+            trip.assignSupervisor(supervisor.get());
+
             // Persistir el viaje
             trip = tripRepository.save(trip);
 

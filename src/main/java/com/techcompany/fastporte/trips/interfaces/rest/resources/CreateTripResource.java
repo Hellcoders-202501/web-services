@@ -5,7 +5,13 @@ public record CreateTripResource(
         Long supervisorId,
         String origin,
         String destination,
+        String type,
+        String amount,
+        String weight,
+        String date,
         String startTime,
-        String endTime
+        String endTime,
+        String subject,
+        String description
 ) {
 }

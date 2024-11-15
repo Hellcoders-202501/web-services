@@ -16,8 +16,14 @@ public class TripInformationResourceFromEntityAssembler {
                 trip.getSupervisor().getUser().getPhone(),
                 trip.getOrigin(),
                 trip.getDestination(),
+                trip.getType(),
+                trip.getAmount(),
+                trip.getWeight(),
+                trip.getDate().toString(),
                 trip.getStartTime(),
                 trip.getEndTime(),
+                trip.getSubject(),
+                trip.getDescription(),
                 trip.getStatus().getStatus().name()
 
         );
