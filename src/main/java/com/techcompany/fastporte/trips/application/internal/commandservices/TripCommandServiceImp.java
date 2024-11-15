@@ -1,9 +1,6 @@
 package com.techcompany.fastporte.trips.application.internal.commandservices;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.techcompany.fastporte.shared.dtos.DriverInformationDto;
-import com.techcompany.fastporte.shared.dtos.SupervisorInformationDto;
-import com.techcompany.fastporte.trips.application.dtos.TripInformationDto;
 import com.techcompany.fastporte.trips.domain.model.aggregates.entities.Notification;
 import com.techcompany.fastporte.trips.domain.model.aggregates.entities.Trip;
 import com.techcompany.fastporte.trips.domain.model.aggregates.entities.TripStatus;
@@ -38,8 +35,6 @@ public class TripCommandServiceImp implements TripCommandService {
     private final NotificationRepository notificationRepository;
     private final DriverRepository driverRepository;
     private final SupervisorRepository supervisorRepository;
-    private final DriverAcl driverAcl;
-    private final SupervisorAcl supervisorAcl;
     private final NotificationWebSocketHandler webSocketHandler;
     private final ObjectMapper objectMapper;
 
@@ -49,14 +44,12 @@ public class TripCommandServiceImp implements TripCommandService {
         this.notificationRepository = notificationRepository;
         this.driverRepository = driverRepository;
         this.supervisorRepository = supervisorRepository;
-        this.driverAcl = driverAcl;
-        this.supervisorAcl = supervisorAcl;
         this.webSocketHandler = webSocketHandler;
         this.objectMapper = objectMapper;
     }
 
     @Override
-    public Optional<TripInformationDto> handle(CreateTripCommand command) {
+    public Optional<Trip> handle(CreateTripCommand command) {
 
         // Mapear el objeto TripRegisterDto a un objeto Trip
         Trip trip = new Trip(command);
@@ -68,30 +61,14 @@ public class TripCommandServiceImp implements TripCommandService {
         trip.setStatus(tripStatus);
 
         // Verificar si el conductor existe
-        Optional<DriverInformationDto> driver = driverAcl.findDriverById(trip.getDriverId());
+        Optional<Driver> driver = driverRepository.findById(command.driverId());
 
         // Verificar si el supervisor existe
-        Optional<SupervisorInformationDto> supervisor = supervisorAcl.findSupervisorById(trip.getSupervisorId());
+        Optional<Supervisor> supervisor = supervisorRepository.findById(command.supervisorId());
 
         if (driver.isPresent() && supervisor.isPresent()) {
             // Persistir el viaje
             trip = tripRepository.save(trip);
-
-            // Mapear el objeto Trip a un objeto TripCreatedDto
-            TripInformationDto tripInformationDto = TripInformationDto.builder()
-                    .tripId(trip.getId())
-                    .driverId(driver.get().id())
-                    .driverName(driver.get().name() + " " + driver.get().firstLastName() + " " + driver.get().secondLastName())
-                    .driverPhoneNumber(driver.get().phone())
-                    .supervisorId(supervisor.get().id())
-                    .supervisorName(supervisor.get().name() + " " + supervisor.get().firstLastName() + " " + supervisor.get().secondLastName())
-                    .supervisorPhoneNumber(supervisor.get().phone())
-                    .origin(trip.getOrigin())
-                    .destination(trip.getDestination())
-                    .startTime(trip.getStartTime())
-                    .endTime(trip.getEndTime())
-                    .status(trip.getStatus().getStatus())
-                    .build();
 
             // Notificar al supervisor
             SaveNotification(trip.getId(), NotificationType.TRIP_CREATED);
@@ -99,10 +76,10 @@ public class TripCommandServiceImp implements TripCommandService {
             // Notificar al conductor
             SaveNotification(trip.getId(), NotificationType.TRIP_ASSIGNED);
 
-            return Optional.of(tripInformationDto);
+            return Optional.of(trip);
 
         } else {
-            throw new RuntimeException("Error: El conductor con el id '" + trip.getDriverId() + "' no existe en la base de datos");
+            throw new RuntimeException("Error: The driver or supervisor with id '" + command.driverId() + "' or '" + command.supervisorId() + "' does not exist in the database");
         }
     }
 
@@ -142,11 +119,11 @@ public class TripCommandServiceImp implements TripCommandService {
             throw new RuntimeException("Error: The trip with id '" + tripId + "' does not exist in the database");
         }
 
-        Optional<Driver> driver = driverRepository.findById(trip.get().getDriverId());
-        Optional<Supervisor> supervisor = supervisorRepository.findById(trip.get().getSupervisorId());
+        Optional<Driver> driver = driverRepository.findById(trip.get().getDriver().getId());
+        Optional<Supervisor> supervisor = supervisorRepository.findById(trip.get().getSupervisor().getId());
 
         if (driver.isEmpty() || supervisor.isEmpty()) {
-            throw new RuntimeException("Error: The driver or supervisor with id '" + trip.get().getDriverId() + "' or '" + trip.get().getSupervisorId() + "' does not exist in the database");
+            throw new RuntimeException("Error: The driver or supervisor with id '" + trip.get().getDriver().getId() + "' or '" + trip.get().getSupervisor().getId() + "' does not exist in the database");
         }
 
         if(notificationType != NotificationType.TRIP_CREATED) {

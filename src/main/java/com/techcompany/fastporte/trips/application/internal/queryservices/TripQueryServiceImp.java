@@ -1,7 +1,5 @@
 package com.techcompany.fastporte.trips.application.internal.queryservices;
 
-import com.techcompany.fastporte.shared.dtos.DriverInformationDto;
-import com.techcompany.fastporte.trips.application.dtos.TripInformationDto;
 import com.techcompany.fastporte.trips.domain.model.aggregates.entities.Trip;
 import com.techcompany.fastporte.trips.domain.model.queries.*;
 import com.techcompany.fastporte.trips.domain.services.TripQueryService;
@@ -30,49 +28,9 @@ public class TripQueryServiceImp implements TripQueryService {
     }
 
     @Override
-    public Optional<TripInformationDto> handle(GetTripByIdQuery query) {
+    public Optional<Trip> handle(GetTripByIdQuery query) {
 
-        Optional<Trip> trip = tripRepository.findById(query.tripId());
-
-        if (trip.isPresent()) {
-            Optional<DriverInformationDto> driver = driverAcl.findDriverById(trip.get().getDriverId());
-
-            if (driver.isPresent()) {
-
-                logger.info("Driver found: " + driver.get().firstLastName());
-
-               TripInformationDto tripInformationDto = TripInformationDto.builder()
-                          .tripId(trip.get().getId())
-                          .driverId(driver.get().id())
-                          .driverName(driver.get().name() + " " + driver.get().firstLastName() + " " + driver.get().secondLastName())
-                          .driverPhoneNumber(driver.get().phone())
-                          .supervisorId(trip.get().getSupervisorId())
-                          .origin(trip.get().getOrigin())
-                          .destination(trip.get().getDestination())
-                          .startTime(trip.get().getStartTime())
-                          .endTime(trip.get().getEndTime())
-                          .status(trip.get().getStatus().getStatus())
-                          .build();
-
-                return Optional.of(tripInformationDto);
-            } else {
-
-                TripInformationDto tripInformationDto = TripInformationDto.builder()
-                          .tripId(trip.get().getId())
-                          .driverId(null)
-                          .driverName(null)
-                          .origin(trip.get().getOrigin())
-                          .destination(trip.get().getDestination())
-                          .startTime(trip.get().getStartTime())
-                          .endTime(trip.get().getEndTime())
-                          .build();
-
-                return Optional.of(tripInformationDto);
-            }
-
-        } else {
-            return Optional.empty();
-        }
+        return tripRepository.findById(query.tripId());
     }
 
     @Override

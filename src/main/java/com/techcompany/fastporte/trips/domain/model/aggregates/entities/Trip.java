@@ -1,6 +1,8 @@
 package com.techcompany.fastporte.trips.domain.model.aggregates.entities;
 
 import com.techcompany.fastporte.trips.domain.model.commands.CreateTripCommand;
+import com.techcompany.fastporte.users.domain.model.aggregates.entities.Driver;
+import com.techcompany.fastporte.users.domain.model.aggregates.entities.Supervisor;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -31,15 +33,19 @@ public class Trip implements Serializable {
     @Column(name = "end_time")
     private String endTime;
 
-    //@ManyToOne(fetch = FetchType.LAZY)
-    //@JoinColumn(name = "driver_id")
-    //private Driver driver;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "driver_id")
+    private Driver driver;
 
-    @Column(name = "driver_id")
-    private Long driverId;
+//    @Column(name = "driver_id")
+//    private Long driverId;
 
-    @Column(name = "supervisor_id")
-    private Long supervisorId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "supervisor_id")
+    private Supervisor supervisor;
+
+//    @Column(name = "supervisor_id")
+//    private Long supervisorId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "status_id")
@@ -50,7 +56,15 @@ public class Trip implements Serializable {
         this.destination = command.destination();
         this.startTime = command.startTime();
         this.endTime = command.endTime();
-        this.driverId = command.driverId();
-        this.supervisorId = command.supervisorId();
+        //this.driverId = command.driverId();
+        //this.supervisorId = command.supervisorId();
+    }
+
+    public void assignDriver(Driver driver) {
+        this.driver = driver;
+    }
+
+    public void assignSupervisor(Supervisor supervisor) {
+        this.supervisor = supervisor;
     }
 }

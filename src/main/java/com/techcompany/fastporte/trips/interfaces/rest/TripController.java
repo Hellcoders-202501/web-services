@@ -1,6 +1,5 @@
 package com.techcompany.fastporte.trips.interfaces.rest;
 
-import com.techcompany.fastporte.trips.application.dtos.TripInformationDto;
 import com.techcompany.fastporte.trips.domain.model.aggregates.entities.Trip;
 import com.techcompany.fastporte.trips.domain.model.commands.CancelTripCommand;
 import com.techcompany.fastporte.trips.domain.model.commands.DeleteTripCommand;
@@ -44,13 +43,10 @@ public class TripController {
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<TripInformationResource> findById(@PathVariable Long id) {
         try {
-            Optional<TripInformationDto> trip = tripQueryService.handle(new GetTripByIdQuery(id));
+            Optional<Trip> trip = tripQueryService.handle(new GetTripByIdQuery(id));
 
-            if (trip.isPresent()) {
-                return ResponseEntity.status(HttpStatus.OK).body(TripInformationResourceFromEntityAssembler.toResourceFromDto(trip.get()));
-            } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-            }
+            return trip.map(value -> ResponseEntity.status(HttpStatus.OK).body(TripInformationResourceFromEntityAssembler.toResourceFromEntity(value)))
+                    .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body(null));
         } catch (Exception e) {
             System.out.println(e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
@@ -66,9 +62,7 @@ public class TripController {
             if (trips.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
             } else {
-                var tripInformationResources = trips.stream()
-                        .map(TripInformationResourceFromEntityAssembler::toResourceFromEntity)
-                        .toList();
+                var tripInformationResources = trips.stream().map(TripInformationResourceFromEntityAssembler::toResourceFromEntity).toList();
 
                 return ResponseEntity.status(HttpStatus.OK).body(tripInformationResources);
             }
@@ -86,9 +80,7 @@ public class TripController {
             if (trips.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
             } else {
-                var tripInformationResources = trips.stream()
-                        .map(TripInformationResourceFromEntityAssembler::toResourceFromEntity)
-                        .toList();
+                var tripInformationResources = trips.stream().map(TripInformationResourceFromEntityAssembler::toResourceFromEntity).toList();
 
                 return ResponseEntity.status(HttpStatus.OK).body(tripInformationResources);
             }
@@ -106,9 +98,7 @@ public class TripController {
             if (trips.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
             } else {
-                var tripInformationResources = trips.stream()
-                        .map(TripInformationResourceFromEntityAssembler::toResourceFromEntity)
-                        .toList();
+                var tripInformationResources = trips.stream().map(TripInformationResourceFromEntityAssembler::toResourceFromEntity).toList();
 
                 return ResponseEntity.status(HttpStatus.OK).body(tripInformationResources);
             }
@@ -126,9 +116,7 @@ public class TripController {
             if (trips.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
             } else {
-                var tripInformationResources = trips.stream()
-                        .map(TripInformationResourceFromEntityAssembler::toResourceFromEntity)
-                        .toList();
+                var tripInformationResources = trips.stream().map(TripInformationResourceFromEntityAssembler::toResourceFromEntity).toList();
 
                 return ResponseEntity.status(HttpStatus.OK).body(tripInformationResources);
             }
@@ -146,9 +134,7 @@ public class TripController {
             if (trips.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
             } else {
-                var tripInformationResources = trips.stream()
-                        .map(TripInformationResourceFromEntityAssembler::toResourceFromEntity)
-                        .toList();
+                var tripInformationResources = trips.stream().map(TripInformationResourceFromEntityAssembler::toResourceFromEntity).toList();
 
                 return ResponseEntity.status(HttpStatus.OK).body(tripInformationResources);
             }
@@ -161,10 +147,8 @@ public class TripController {
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<TripInformationResource> save(@Valid @RequestBody CreateTripResource resource) {
         try {
-            Optional<TripInformationDto> trip = tripCommandService.handle(CreateTripCommandFromResourceAssembler.toCommandFromResource(resource));
-            return trip.map(TripInformationResourceFromEntityAssembler::toResourceFromDto)
-                    .map(tripInformationResource -> ResponseEntity.status(HttpStatus.CREATED).body(tripInformationResource))
-                    .orElseGet(() -> ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null));
+            Optional<Trip> trip = tripCommandService.handle(CreateTripCommandFromResourceAssembler.toCommandFromResource(resource));
+            return trip.map(TripInformationResourceFromEntityAssembler::toResourceFromEntity).map(tripInformationResource -> ResponseEntity.status(HttpStatus.CREATED).body(tripInformationResource)).orElseGet(() -> ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
@@ -174,7 +158,7 @@ public class TripController {
     @DeleteMapping(value = "/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         try {
-            if(tripQueryService.handle(new CheckTripExistsByIdQuery(id))){
+            if (tripQueryService.handle(new CheckTripExistsByIdQuery(id))) {
                 tripCommandService.handle(new DeleteTripCommand(id));
                 return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
             } else {
@@ -189,7 +173,7 @@ public class TripController {
     @PostMapping(value = "/{id}/starts")
     public ResponseEntity<Void> start(@PathVariable Long id) {
         try {
-            if(tripQueryService.handle(new CheckTripExistsByIdQuery(id))){
+            if (tripQueryService.handle(new CheckTripExistsByIdQuery(id))) {
                 tripCommandService.handle(new StartTripCommand(id));
                 return ResponseEntity.status(HttpStatus.OK).build();
             } else {
@@ -204,7 +188,7 @@ public class TripController {
     @PostMapping(value = "/{id}/completions")
     public ResponseEntity<Void> finish(@PathVariable Long id) {
         try {
-            if(tripQueryService.handle(new CheckTripExistsByIdQuery(id))){
+            if (tripQueryService.handle(new CheckTripExistsByIdQuery(id))) {
                 tripCommandService.handle(new FinishTripCommand(id));
                 return ResponseEntity.status(HttpStatus.OK).build();
             } else {
@@ -219,7 +203,7 @@ public class TripController {
     @PostMapping(value = "/{id}/cancellations")
     public ResponseEntity<Void> cancel(@PathVariable Long id) {
         try {
-            if(tripQueryService.handle(new CheckTripExistsByIdQuery(id))){
+            if (tripQueryService.handle(new CheckTripExistsByIdQuery(id))) {
                 tripCommandService.handle(new CancelTripCommand(id));
                 return ResponseEntity.status(HttpStatus.OK).build();
             } else {
