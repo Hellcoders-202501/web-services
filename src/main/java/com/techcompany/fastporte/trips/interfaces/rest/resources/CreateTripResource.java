@@ -1,10 +1,11 @@
 package com.techcompany.fastporte.trips.interfaces.rest.resources;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 public record CreateTripResource(
-        @NotBlank(message = "Driver ID is required") Long driverId,
-        @NotBlank(message = "Supervisor ID is required") Long supervisorId,
+        @NotNull(message = "Driver ID is required") Long driverId,
+        @NotNull(message = "Supervisor ID is required") Long supervisorId,
         @NotBlank(message = "Origin is required") String origin,
         @NotBlank(message = "Destination is required") String destination,
         @NotBlank(message = "Type is required") String type,
