@@ -31,6 +31,7 @@ public class RealTimeSensorDataCommandServiceImp implements RealTimeSensorDataCo
         }
 
         realTimeSensorDataRepository.saveAll(realTimeSensorDataList);
+        System.out.println("Saved " + realTimeSensorDataList.size() + " records");
 
     }
 }

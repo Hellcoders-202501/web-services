@@ -8,7 +8,7 @@ public class RealTimeSensorDataDtoFromEntityAssembler {
 
     public static RealTimeSensorDataDto toDtoFromEntity(RealTimeSensorData realTimeSensorData) {
         return new RealTimeSensorDataDto(
-                realTimeSensorData.getId(),
+                realTimeSensorData.getTripId(),
                 realTimeSensorData.getTemperatureValue(),
                 realTimeSensorData.getHumidityValue(),
                 realTimeSensorData.getPressureValue(),

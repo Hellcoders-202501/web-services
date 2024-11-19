@@ -10,6 +10,8 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
 @Builder
 @Entity
@@ -42,11 +44,18 @@ public class RealTimeSensorData implements Serializable {
     LocalDateTime timestamp;
 
     public RealTimeSensorData(RealTimeSensorDataDto dto) {
+
+        // Obtén la zona horaria de Perú
+        ZoneId peruZone = ZoneId.of("America/Lima");
+
+        // Obtén la hora actual en Perú
+        ZonedDateTime peruTime = ZonedDateTime.now(peruZone);
+
         this.tripId = dto.tripId();
         this.temperatureValue = dto.temperatureValue();
         this.humidityValue = dto.humidityValue();
         this.pressureValue = dto.pressureValue();
         this.gasValue = dto.gasValue();
-        this.timestamp = LocalDateTime.now();
+        this.timestamp = peruTime.toLocalDateTime();
     }
 }

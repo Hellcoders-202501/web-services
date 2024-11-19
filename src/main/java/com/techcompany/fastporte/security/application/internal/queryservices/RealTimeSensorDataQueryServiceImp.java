@@ -7,6 +7,8 @@ import com.techcompany.fastporte.security.infrastructure.persistence.jpa.RealTim
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 @Service
@@ -21,8 +23,15 @@ public class RealTimeSensorDataQueryServiceImp implements RealTimeSensorDataQuer
 
     @Override
     public List<RealTimeSensorData> handle(GetRealTimeSensorDataQuery query) {
+
+        // Obtén la zona horaria de Perú
+        ZoneId peruZone = ZoneId.of("America/Lima");
+
+        // Obtén la hora actual en Perú
+        ZonedDateTime peruTime = ZonedDateTime.now(peruZone);
+
         // Calcula el timestamp de hace 30 segundos
-        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime now = peruTime.toLocalDateTime();
         LocalDateTime thirtySecondsAgo = now.minusSeconds(30);
 
         return realTimeSensorDataRepository.findRecentRecordsByTripId(query.tripId(), thirtySecondsAgo);
