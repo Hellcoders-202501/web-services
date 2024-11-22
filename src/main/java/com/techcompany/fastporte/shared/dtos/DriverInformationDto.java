@@ -4,6 +4,7 @@ public record DriverInformationDto(
         Long id,
         String name,
         String firstLastName,
-        String secondLastName
+        String secondLastName,
+        String phone
 ) {
 }

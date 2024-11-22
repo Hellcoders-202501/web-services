@@ -6,7 +6,6 @@ public record UpdateSupervisorInformationResource(
         String firstLastName,
         String secondLastName,
         String email,
-        String password,
         String phone
 ) {
 }

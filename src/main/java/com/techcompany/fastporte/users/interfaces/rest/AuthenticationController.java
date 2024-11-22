@@ -4,15 +4,15 @@ import com.techcompany.fastporte.users.domain.model.commands.auth.AuthenticateAc
 import com.techcompany.fastporte.users.domain.services.auth.AuthenticationCommandService;
 import com.techcompany.fastporte.users.interfaces.rest.resources.LoginResource;
 import com.techcompany.fastporte.users.interfaces.rest.resources.TokenResource;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @CrossOrigin
 @RestController
+@RequestMapping("/api/v1/auth")
+@Tag(name = "Authentication", description = "Operations related to user authentication and authorization")
 public class AuthenticationController {
 
     private final AuthenticationCommandService authenticationService;
@@ -21,7 +21,7 @@ public class AuthenticationController {
         this.authenticationService = authenticationService;
     }
 
-    @PostMapping("/authenticate")
+    @PostMapping() //@PostMapping("/authenticate")
     public ResponseEntity<TokenResource> createAuthenticationToken(@RequestBody LoginResource resource) {
 
         String username = resource.email();

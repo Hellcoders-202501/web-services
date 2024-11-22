@@ -15,6 +15,8 @@ import com.techcompany.fastporte.users.interfaces.rest.resources.UpdateDriverInf
 import com.techcompany.fastporte.users.interfaces.rest.transform.fromEntity.DriverInformationResourceFromEntityAssembler;
 import com.techcompany.fastporte.users.interfaces.rest.transform.fromResource.RegisterDriverCommandFromResourceAssembler;
 import com.techcompany.fastporte.users.interfaces.rest.transform.fromResource.UpdateDriverInformationCommandFromResourceAssembler;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -28,7 +30,8 @@ import java.util.Optional;
 
 @CrossOrigin
 @RestController
-@RequestMapping("/api/drivers")
+@RequestMapping("/api/v1/drivers")
+@Tag(name = "Driver Management", description = "Operations for managing drivers, including creation, updating, and retrieval")
 public class DriverController {
     private final DriverCommandService driverCommandService;
     private final DriverQueryService driverQueryService;
@@ -38,6 +41,7 @@ public class DriverController {
         this.driverQueryService = driverQueryService;
     }
 
+    @Operation(summary = "Get a driver by ID", description = "Retrieves the details of a specific driver by their ID.")
     @PreAuthorize("hasRole('ROLE_DRIVER') or hasRole('ROLE_SUPERVISOR') or hasRole('ROLE_ADMIN') ")
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> findById(@PathVariable Long id, @AuthenticationPrincipal UserDetailsImp userDetails) {
@@ -57,6 +61,7 @@ public class DriverController {
         }
     }
 
+    @Operation(summary = "Get all drivers", description = "Retrieves a list of all drivers.")
     @PreAuthorize("hasRole('ROLE_DRIVER') or hasRole('ROLE_SUPERVISOR') or hasRole('ROLE_ADMIN') ")
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<DriverInformationResource>> findAll() {
@@ -80,6 +85,7 @@ public class DriverController {
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping("/batch")
+    @Operation(summary = "Get drivers in batch", description = "Retrieves a list of drivers by their IDs.")
     public ResponseEntity<List<DriverInformationResource>> findAllByIdIn(@RequestBody List<Long> driverIds) {
         List<Driver> drivers = driverQueryService.handle(new GetAllDriversByIdInList(driverIds));
 
@@ -90,7 +96,7 @@ public class DriverController {
         return ResponseEntity.ok(driverInformationResources);
     }
 
-    @GetMapping(value = "/supervisor/{supervisorId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    /*@GetMapping(value = "/supervisor/{supervisorId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<DriverInformationResource>> findAllBySupervisorId(@PathVariable Long supervisorId) {
         try{
             List<Driver> drivers = driverQueryService.handle(new GetAllDriversBySupervisorIdQuery(supervisorId));
@@ -107,9 +113,10 @@ public class DriverController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
-    }
+    }*/
 
-    @PostMapping(value = "/register", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Create a new driver", description = "Creates a new driver with the provided details.")
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> save(@Valid @RequestBody RegisterDriverResource resource) {
 
         Optional<Driver> driver = driverCommandService.handle(RegisterDriverCommandFromResourceAssembler.toCommandFromResource(resource));
@@ -118,8 +125,9 @@ public class DriverController {
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null));
     }
 
-    @PutMapping(value = "/update", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> update(@Valid @RequestBody UpdateDriverInformationResource resource) {
+    @Operation(summary = "Update driver information", description = "Updates the details of a driver.")
+    @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> update(@RequestBody UpdateDriverInformationResource resource) {
 
         Optional<Driver> driver = driverCommandService.handle(UpdateDriverInformationCommandFromResourceAssembler.toCommandFromResource(resource));
         return driver.map(DriverInformationResourceFromEntityAssembler::toPublicResourceFromEntity)
@@ -127,8 +135,9 @@ public class DriverController {
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null));
     }
 
+    @Operation(summary = "Delete a driver by ID", description = "Deletes the driver with the specified ID.")
     @PreAuthorize("hasRole('ROLE_DRIVER') or hasRole('ROLE_ADMIN')")
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         try {
             if (driverQueryService.handle(new GetDriverByIdQuery(id)).isPresent()) {

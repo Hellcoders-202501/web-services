@@ -12,7 +12,6 @@ public class UpdateDriverInformationCommandFromResourceAssembler {
                 resource.firstLastName(),
                 resource.secondLastName(),
                 resource.email(),
-                resource.password(),
                 resource.phone()
         );
     }

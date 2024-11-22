@@ -4,6 +4,7 @@ public record SupervisorInformationDto(
         Long id,
         String name,
         String firstLastName,
-        String secondLastName
+        String secondLastName,
+        String phone
 ) {
 }

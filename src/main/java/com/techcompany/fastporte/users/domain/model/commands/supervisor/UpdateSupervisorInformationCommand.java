@@ -6,7 +6,6 @@ public record UpdateSupervisorInformationCommand(
         String firstLastName,
         String secondLastName,
         String email,
-        String password,
         String phone
 ) {
 }

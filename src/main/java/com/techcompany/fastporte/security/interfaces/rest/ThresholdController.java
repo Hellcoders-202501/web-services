@@ -12,6 +12,9 @@ import com.techcompany.fastporte.security.interfaces.rest.resources.UpdateSafety
 import com.techcompany.fastporte.security.interfaces.rest.transform.fromEntity.SafetyThresholdInformationResourceFromEntityAssembler;
 import com.techcompany.fastporte.security.interfaces.rest.transform.fromResource.CreateSafetyThresholdCommandFromResourceAssembler;
 import com.techcompany.fastporte.security.interfaces.rest.transform.fromResource.UpdateSafetyThresholdCommandFromResourceAssembler;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +25,8 @@ import java.util.Optional;
 
 @CrossOrigin
 @RestController
-@RequestMapping("/api/thresholds")
+@RequestMapping("/api/v1/thresholds")
+@Tag(name = "Threshold Management", description = "Operations for managing safety thresholds, including creation, updating, and retrieval by trip")
 public class ThresholdController {
 
     private final SafetyThresholdCommandService safetyThresholdCommandService;
@@ -33,6 +37,7 @@ public class ThresholdController {
         this.safetyThresholdQueryService = safetyThresholdQueryService;
     }
 
+    @Operation(summary = "Get thresholds by trip ID", description = "Retrieves the thresholds associated with the specified trip ID.")
     @GetMapping("/trip/{tripId}")
     public ResponseEntity<List<SafetyThresholdInformationResource>> getThresholdsByTripId(@PathVariable Long tripId) {
         try {
@@ -55,6 +60,7 @@ public class ThresholdController {
     }
 
 
+    @Operation(summary = "Create new thresholds", description = "Creates new safety thresholds for monitoring.")
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<SafetyThresholdInformationResource> createThreshold(@RequestBody CreateSafetyThresholdResource createThresholdResource) {
         try {
@@ -73,9 +79,9 @@ public class ThresholdController {
         }
     }
 
-    @PostMapping(value = "/update", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<SafetyThresholdInformationResource> updateThreshold(@RequestBody UpdateSafetyThresholdResource resource) {
-
+    @Operation(summary = "Update thresholds", description = "Updates the safety thresholds for monitoring.")
+    @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<SafetyThresholdInformationResource> updateThreshold(@Valid @RequestBody UpdateSafetyThresholdResource resource) {
         try{
 
             UpdateSafetyThresholdCommand command = UpdateSafetyThresholdCommandFromResourceAssembler.toCommandFromResource(resource);

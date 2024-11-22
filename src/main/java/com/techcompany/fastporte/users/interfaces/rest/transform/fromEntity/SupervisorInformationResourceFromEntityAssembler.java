@@ -13,7 +13,8 @@ public class SupervisorInformationResourceFromEntityAssembler {
                 supervisor.getUser().getSecondLastName(),
                 supervisor.getUser().getEmail(),
                 supervisor.getUser().getPhone(),
-                supervisor.getUser().getUsername()
+                supervisor.getUser().getUsername(),
+                supervisor.getUser().getId()
         );
     }
 }

@@ -23,7 +23,7 @@ public class DriverAcl {
     String INTERNAL_API_KEY;
 
     private final RestTemplate restTemplate;
-    private final String BASE_URL = EnvironmentConstants.CURRENT_ENV_URL + "/api/drivers/";
+    private final String BASE_URL = EnvironmentConstants.CURRENT_ENV_URL + "/api/v1/drivers/";
 
     private static final Logger logger = LoggerFactory.getLogger(DriverAcl.class);
 

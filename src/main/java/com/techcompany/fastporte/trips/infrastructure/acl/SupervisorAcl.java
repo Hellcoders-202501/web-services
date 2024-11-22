@@ -21,7 +21,7 @@ public class SupervisorAcl {
     String INTERNAL_API_KEY;
 
     private final RestTemplate restTemplate;
-    private final String BASE_URL = EnvironmentConstants.CURRENT_ENV_URL + "/api/supervisors/";
+    private final String BASE_URL = EnvironmentConstants.CURRENT_ENV_URL + "/api/v1/supervisors/";
 
     public SupervisorAcl(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;

@@ -1,26 +1,18 @@
 package com.techcompany.fastporte.users.application.internal.commandservices;
 
-import com.techcompany.fastporte.users.domain.model.aggregates.entities.Driver;
-import com.techcompany.fastporte.users.domain.model.aggregates.entities.Role;
-import com.techcompany.fastporte.users.domain.model.aggregates.entities.Supervisor;
-import com.techcompany.fastporte.users.domain.model.aggregates.entities.User;
+import com.techcompany.fastporte.users.domain.model.aggregates.entities.*;
 import com.techcompany.fastporte.users.domain.model.aggregates.enums.RoleName;
 import com.techcompany.fastporte.users.domain.model.commands.driver.DeleteDriverCommand;
 import com.techcompany.fastporte.users.domain.model.commands.driver.RegisterDriverCommand;
 import com.techcompany.fastporte.users.domain.model.commands.driver.UpdateDriverInformationCommand;
-import com.techcompany.fastporte.users.domain.model.exceptions.DriverNotFoundException;
-import com.techcompany.fastporte.users.domain.model.exceptions.EmailAlreadyExistsException;
-import com.techcompany.fastporte.users.domain.model.exceptions.RoleNotFoundException;
-import com.techcompany.fastporte.users.domain.model.exceptions.SupervisorNotFoundException;
+import com.techcompany.fastporte.users.domain.model.exceptions.*;
 import com.techcompany.fastporte.users.domain.services.driver.DriverCommandService;
-import com.techcompany.fastporte.users.infrastructure.persistence.jpa.DriverRepository;
-import com.techcompany.fastporte.users.infrastructure.persistence.jpa.RoleRepository;
-import com.techcompany.fastporte.users.infrastructure.persistence.jpa.SupervisorRepository;
-import com.techcompany.fastporte.users.infrastructure.persistence.jpa.UserRepository;
+import com.techcompany.fastporte.users.infrastructure.persistence.jpa.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -33,55 +25,75 @@ public class DriverCommandServiceImp implements DriverCommandService {
     private final SupervisorRepository supervisorRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
+    private final SensorCodeRepository sensorCodeRepository;
 
-    public DriverCommandServiceImp(UserRepository userRepository, DriverRepository driverRepository, SupervisorRepository supervisorRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
+    public DriverCommandServiceImp(UserRepository userRepository, DriverRepository driverRepository, SupervisorRepository supervisorRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder, SensorCodeRepository sensorCodeRepository) {
         this.userRepository = userRepository;
         this.driverRepository = driverRepository;
         this.supervisorRepository = supervisorRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
+        this.sensorCodeRepository = sensorCodeRepository;
     }
 
     @Override
     public Optional<Driver> handle(RegisterDriverCommand command) {
 
-        //Buscar si el username/*email* existe
+        /// Search if the email already exists
         if (userRepository.existsByEmail(command.email())) {
             System.out.println("Email already exists");
             throw new EmailAlreadyExistsException(command.email());
         }
 
-        Supervisor supervisor = null;
+        /*Supervisor supervisor = null;
 
-        //Buscar si el supervisor existe
+        /// Search if the supervisor exists
         if (command.supervisorId() != null) {
             supervisor = supervisorRepository.findById(command.supervisorId())
                     .orElseThrow(() -> new SupervisorNotFoundException(command.supervisorId()));
+        }*/
+
+        /// Check if the sensor_code exists
+        if (!sensorCodeRepository.existsByCode(command.sensorCode())) {
+            throw new SensorCodeNotFoundException(command.sensorCode());
         }
 
-        // Mapear el objeto DriverRegisterDto a un objeto Driver
+
+        /// Check if the sensor_code has five drivers assigned
+        List<SensorCode> availableSensorCodes  = sensorCodeRepository.findByCodeAndDriverIsNull(command.sensorCode());
+
+        if (availableSensorCodes.isEmpty()) {
+            throw new LimitDriverBySensorCodeException(command.sensorCode());
+        }
+
+        SensorCode sensorCodeToAssign = availableSensorCodes.get(0);
+        Supervisor supervisor = sensorCodeToAssign.getSupervisor();
+        /// Create the driver object
         Driver driver = new Driver(command, supervisor);
 
-        // Persistir el objeto User primero
+        /// Create the user object
         User user = driver.getUser();
 
-        // Recuperar el rol desde la base de datos
+        /// Search the role driver
         Role driverRole = roleRepository.findByRoleName(RoleName.ROLE_DRIVER)
                 .orElseThrow(() -> new RoleNotFoundException(RoleName.ROLE_DRIVER.toString()));
 
-        // Asignar el rol al usuario
+        /// Assign the role to the user
         user.setRoles(Set.of(driverRole));
 
-        // Cifrar la contraseña del usuario antes de guardarlo
+        /// Encode the password
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 
         User savedUser = userRepository.save(driver.getUser());
 
-        // Asignar el objeto User persistido al objeto Driver
+        /// Assign the user to the driver
         driver.setUser(savedUser);
         Driver savedDriver = driverRepository.save(driver);
 
-        //return driverMapper.driverToResponseDto(savedDriver);
+        /// Assign the driver to the sensor code
+        sensorCodeToAssign.setDriver(savedDriver);
+        sensorCodeRepository.save(sensorCodeToAssign);
+
         return Optional.of(savedDriver);
     }
 
@@ -97,7 +109,6 @@ public class DriverCommandServiceImp implements DriverCommandService {
         user.setFirstLastName(command.firstLastName());
         user.setSecondLastName(command.secondLastName());
         user.setEmail(command.email());
-        user.setPassword(passwordEncoder.encode(command.password()));
         user.setPhone(command.phone());
 
         return Optional.of(driverRepository.save(driver));
