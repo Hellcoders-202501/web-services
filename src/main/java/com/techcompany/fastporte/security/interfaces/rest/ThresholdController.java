@@ -37,6 +37,7 @@ public class ThresholdController {
         this.safetyThresholdQueryService = safetyThresholdQueryService;
     }
 
+    /*
     @Operation(summary = "Get thresholds by trip ID", description = "Retrieves the thresholds associated with the specified trip ID.")
     @GetMapping("/trip/{tripId}")
     public ResponseEntity<List<SafetyThresholdInformationResource>> getThresholdsByTripId(@PathVariable Long tripId) {
@@ -58,7 +59,6 @@ public class ThresholdController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
-
 
     @Operation(summary = "Create new thresholds", description = "Creates new safety thresholds for monitoring.")
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -100,4 +100,5 @@ public class ThresholdController {
         }
 
     }
+    */
 }

@@ -33,6 +33,7 @@ public class AlertController {
         this.alertQueryService = alertQueryService;
     }
 
+    /*
     @Operation(summary = "Get alerts by trip ID", description = "Retrieves all alerts associated with the specified trip ID.")
     @GetMapping("/trip/{tripId}")
     public ResponseEntity<List<AlertInformationResource>> getAlertsByTripId(@PathVariable Long tripId) {
@@ -76,6 +77,5 @@ public class AlertController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
-
-
+    */
 }

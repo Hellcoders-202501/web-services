@@ -29,6 +29,7 @@ public class RealTimeSensorDataController {
         this.realTimeSensorDataQueryService = realTimeSensorDataQueryService;
     }
 
+    /*
     @GetMapping("/trip/{tripId}")
     public ResponseEntity<List<RealTimeSensorDataDto>> getSensorDataByTripId(@PathVariable Long tripId) {
         try {
@@ -59,4 +60,5 @@ public class RealTimeSensorDataController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
+    */
 }
