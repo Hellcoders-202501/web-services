@@ -44,7 +44,7 @@ public class JwtUtil {
     }
 
     /// Generate token
-    /// userId: Could be the driverId or the supervisorId
+    /// userId: Could be the driverId or the clientId
     public String generateToken(String username, Long userId, String role) {
         Map<String, Object> claims = new HashMap<>();
         return createToken(claims, username, userId, role);

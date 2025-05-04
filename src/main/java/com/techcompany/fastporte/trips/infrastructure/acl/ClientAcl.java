@@ -1,6 +1,6 @@
 package com.techcompany.fastporte.trips.infrastructure.acl;
 
-import com.techcompany.fastporte.shared.dtos.SupervisorInformationDto;
+import com.techcompany.fastporte.shared.dtos.ClientInformationDto;
 import com.techcompany.fastporte.shared.utils.EnvironmentConstants;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
@@ -15,27 +15,27 @@ import java.util.List;
 import java.util.Optional;
 
 @Component
-public class SupervisorAcl {
+public class ClientAcl {
 
     @Value("${internal.api.key}")
     String INTERNAL_API_KEY;
 
     private final RestTemplate restTemplate;
-    private final String BASE_URL = EnvironmentConstants.CURRENT_ENV_URL + "/api/v1/supervisors/";
+    private final String BASE_URL = EnvironmentConstants.CURRENT_ENV_URL + "/api/v1/clients/";
 
-    public SupervisorAcl(RestTemplate restTemplate) {
+    public ClientAcl(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
     }
 
-    public Optional<SupervisorInformationDto> findSupervisorById(Long id) {
+    public Optional<ClientInformationDto> findClientById(Long id) {
         String url = BASE_URL + id;
         try {
             HttpHeaders headers = new HttpHeaders();
             headers.set("X-Internal-API-Key", INTERNAL_API_KEY);
             HttpEntity<Void> entity = new HttpEntity<>(headers);
-            SupervisorInformationDto supervisorDto = restTemplate.exchange(url, HttpMethod.GET, entity, SupervisorInformationDto.class).getBody();
-            if (supervisorDto != null) {
-                return Optional.of(supervisorDto);
+            ClientInformationDto clientDto = restTemplate.exchange(url, HttpMethod.GET, entity, ClientInformationDto.class).getBody();
+            if (clientDto != null) {
+                return Optional.of(clientDto);
             } else {
                 return Optional.empty();
             }
@@ -44,13 +44,13 @@ public class SupervisorAcl {
         }
     }
 
-    public List<SupervisorInformationDto> findAllSupervisorsByIdIn(List<Long> ids){
+    public List<ClientInformationDto> findAllClientsByIdIn(List<Long> ids){
         String url = BASE_URL + "batch";
-        ResponseEntity<List<SupervisorInformationDto>> response = restTemplate.exchange(
+        ResponseEntity<List<ClientInformationDto>> response = restTemplate.exchange(
                 url,
                 HttpMethod.POST,
                 new HttpEntity<>(ids),
-                new ParameterizedTypeReference<List<SupervisorInformationDto>>() {
+                new ParameterizedTypeReference<List<ClientInformationDto>>() {
                 }
         );
         return response.getBody();

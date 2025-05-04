@@ -9,16 +9,16 @@ import com.techcompany.fastporte.trips.domain.model.aggregates.enums.Status;
 import com.techcompany.fastporte.trips.domain.model.commands.*;
 import com.techcompany.fastporte.trips.domain.services.TripCommandService;
 import com.techcompany.fastporte.trips.infrastructure.acl.DriverAcl;
-import com.techcompany.fastporte.trips.infrastructure.acl.SupervisorAcl;
+import com.techcompany.fastporte.trips.infrastructure.acl.ClientAcl;
 import com.techcompany.fastporte.trips.infrastructure.persistence.jpa.NotificationRepository;
 import com.techcompany.fastporte.trips.infrastructure.persistence.jpa.TripRepository;
 import com.techcompany.fastporte.trips.infrastructure.persistence.jpa.TripStatusRepository;
 import com.techcompany.fastporte.trips.infrastructure.websocket.NotificationWebSocketHandler;
 import com.techcompany.fastporte.users.domain.model.aggregates.entities.Driver;
-import com.techcompany.fastporte.users.domain.model.aggregates.entities.Supervisor;
+import com.techcompany.fastporte.users.domain.model.aggregates.entities.Client;
 import com.techcompany.fastporte.users.domain.model.aggregates.enums.RoleName;
 import com.techcompany.fastporte.users.infrastructure.persistence.jpa.DriverRepository;
-import com.techcompany.fastporte.users.infrastructure.persistence.jpa.SupervisorRepository;
+import com.techcompany.fastporte.users.infrastructure.persistence.jpa.ClientRepository;
 import com.techcompany.fastporte.users.infrastructure.persistence.jpa.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,16 +34,16 @@ public class TripCommandServiceImp implements TripCommandService {
     private final TripStatusRepository tripStatusRepository;
     private final NotificationRepository notificationRepository;
     private final DriverRepository driverRepository;
-    private final SupervisorRepository supervisorRepository;
+    private final ClientRepository clientRepository;
     private final NotificationWebSocketHandler webSocketHandler;
     private final ObjectMapper objectMapper;
 
-    public TripCommandServiceImp(TripRepository tripRepository, TripStatusRepository tripStatusRepository, NotificationRepository notificationRepository, UserRepository userRepository, DriverRepository driverRepository, SupervisorRepository supervisorRepository, DriverAcl driverAcl, SupervisorAcl supervisorAcl, NotificationWebSocketHandler webSocketHandler, ObjectMapper objectMapper) {
+    public TripCommandServiceImp(TripRepository tripRepository, TripStatusRepository tripStatusRepository, NotificationRepository notificationRepository, UserRepository userRepository, DriverRepository driverRepository, ClientRepository clientRepository, DriverAcl driverAcl, ClientAcl clientAcl, NotificationWebSocketHandler webSocketHandler, ObjectMapper objectMapper) {
         this.tripRepository = tripRepository;
         this.tripStatusRepository = tripStatusRepository;
         this.notificationRepository = notificationRepository;
         this.driverRepository = driverRepository;
-        this.supervisorRepository = supervisorRepository;
+        this.clientRepository = clientRepository;
         this.webSocketHandler = webSocketHandler;
         this.objectMapper = objectMapper;
     }
@@ -63,19 +63,19 @@ public class TripCommandServiceImp implements TripCommandService {
         // Verificar si el conductor existe
         Optional<Driver> driver = driverRepository.findById(command.driverId());
 
-        // Verificar si el supervisor existe
-        Optional<Supervisor> supervisor = supervisorRepository.findById(command.supervisorId());
+        // Verificar si el client existe
+        Optional<Client> client = clientRepository.findById(command.clientId());
 
-        if (driver.isPresent() && supervisor.isPresent()) {
+        if (driver.isPresent() && client.isPresent()) {
 
-            // Asignar el conductor y el supervisor al viaje
+            // Asignar el conductor y el client al viaje
             trip.assignDriver(driver.get());
-            trip.assignSupervisor(supervisor.get());
+            trip.assignClient(client.get());
 
             // Persistir el viaje
             trip = tripRepository.save(trip);
 
-            // Notificar al supervisor
+            // Notificar al client
             SaveNotification(trip.getId(), NotificationType.TRIP_CREATED);
 
             // Notificar al conductor
@@ -84,7 +84,7 @@ public class TripCommandServiceImp implements TripCommandService {
             return Optional.of(trip);
 
         } else {
-            throw new RuntimeException("Error: The driver or supervisor with id '" + command.driverId() + "' or '" + command.supervisorId() + "' does not exist in the database");
+            throw new RuntimeException("Error: The driver or client with id '" + command.driverId() + "' or '" + command.clientId() + "' does not exist in the database");
         }
     }
 
@@ -125,10 +125,10 @@ public class TripCommandServiceImp implements TripCommandService {
         }
 
         Optional<Driver> driver = driverRepository.findById(trip.get().getDriver().getId());
-        Optional<Supervisor> supervisor = supervisorRepository.findById(trip.get().getSupervisor().getId());
+        Optional<Client> client = clientRepository.findById(trip.get().getClient().getId());
 
-        if (driver.isEmpty() || supervisor.isEmpty()) {
-            throw new RuntimeException("Error: The driver or supervisor with id '" + trip.get().getDriver().getId() + "' or '" + trip.get().getSupervisor().getId() + "' does not exist in the database");
+        if (driver.isEmpty() || client.isEmpty()) {
+            throw new RuntimeException("Error: The driver or client with id '" + trip.get().getDriver().getId() + "' or '" + trip.get().getClient().getId() + "' does not exist in the database");
         }
 
         if(notificationType != NotificationType.TRIP_CREATED) {
@@ -158,25 +158,25 @@ public class TripCommandServiceImp implements TripCommandService {
         }
 
         if(notificationType != NotificationType.TRIP_ASSIGNED) {
-            // Notify the supervisor
+            // Notify the client
             Notification notification = Notification.builder()
                     .timestamp(LocalDateTime.now())
                     .type(notificationType)
                     .seen(false)
-                    .user(supervisor.get().getUser())
+                    .user(client.get().getUser())
                     .trip(trip.get())
                     .build();
 
             notificationRepository.save(notification);
 
-            // Enviar notificación en tiempo real al supervisor
-            Long supervisorUserId = supervisor.get().getUser().getId();
-            RoleName role = supervisor.get().getUser().getRoles().stream().findFirst().get().getRoleName();
+            // Enviar notificación en tiempo real al client
+            Long clientUserId = client.get().getUser().getId();
+            RoleName role = client.get().getUser().getRoles().stream().findFirst().get().getRoleName();
 
-            if (webSocketHandler.isUserConnected(supervisorUserId, role)) {
+            if (webSocketHandler.isUserConnected(clientUserId, role)) {
                 try {
                     String notificationJson = objectMapper.writeValueAsString(notification.toDto());
-                    webSocketHandler.sendNotification(notificationJson, supervisorUserId);
+                    webSocketHandler.sendNotification(notificationJson, clientUserId);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

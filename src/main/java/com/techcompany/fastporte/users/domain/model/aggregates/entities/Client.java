@@ -1,6 +1,6 @@
 package com.techcompany.fastporte.users.domain.model.aggregates.entities;
 
-import com.techcompany.fastporte.users.domain.model.commands.supervisor.RegisterSupervisorCommand;
+import com.techcompany.fastporte.users.domain.model.commands.client.RegisterClientCommand;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -11,10 +11,10 @@ import java.util.List;
 
 @Entity
 @Data
-@Table(name = "supervisor")
+@Table(name = "client")
 @AllArgsConstructor
 @NoArgsConstructor
-public class Supervisor implements Serializable {
+public class Client implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,11 +26,11 @@ public class Supervisor implements Serializable {
     @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
     private User user;
-
-    @OneToMany(mappedBy = "supervisor", fetch = FetchType.LAZY)
+/*
+    @OneToMany(mappedBy = "client", fetch = FetchType.LAZY)
     private List<Driver> drivers;
-
-    public Supervisor(RegisterSupervisorCommand command) {
+*/
+    public Client(RegisterClientCommand command) {
         this.user = new User(command);
         //this.department = command.department();
     }

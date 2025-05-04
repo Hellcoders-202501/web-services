@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotNull;
 
 public record CreateTripResource(
         @NotNull(message = "Driver ID is required") Long driverId,
-        @NotNull(message = "Supervisor ID is required") Long supervisorId,
+        @NotNull(message = "Client ID is required") Long clientId,
         @NotBlank(message = "Origin is required") String origin,
         @NotBlank(message = "Destination is required") String destination,
         @NotBlank(message = "Type is required") String type,

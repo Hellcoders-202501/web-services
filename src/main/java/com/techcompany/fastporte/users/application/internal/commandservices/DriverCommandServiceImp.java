@@ -22,18 +22,14 @@ public class DriverCommandServiceImp implements DriverCommandService {
 
     private final UserRepository userRepository;
     private final DriverRepository driverRepository;
-    private final SupervisorRepository supervisorRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
-    private final SensorCodeRepository sensorCodeRepository;
 
-    public DriverCommandServiceImp(UserRepository userRepository, DriverRepository driverRepository, SupervisorRepository supervisorRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder, SensorCodeRepository sensorCodeRepository) {
+    public DriverCommandServiceImp(UserRepository userRepository, DriverRepository driverRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.driverRepository = driverRepository;
-        this.supervisorRepository = supervisorRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
-        this.sensorCodeRepository = sensorCodeRepository;
     }
 
     @Override
@@ -45,31 +41,8 @@ public class DriverCommandServiceImp implements DriverCommandService {
             throw new EmailAlreadyExistsException(command.email());
         }
 
-        /*Supervisor supervisor = null;
-
-        /// Search if the supervisor exists
-        if (command.supervisorId() != null) {
-            supervisor = supervisorRepository.findById(command.supervisorId())
-                    .orElseThrow(() -> new SupervisorNotFoundException(command.supervisorId()));
-        }*/
-
-        /// Check if the sensor_code exists
-        if (!sensorCodeRepository.existsByCode(command.sensorCode())) {
-            throw new SensorCodeNotFoundException(command.sensorCode());
-        }
-
-
-        /// Check if the sensor_code has five drivers assigned
-        List<SensorCode> availableSensorCodes  = sensorCodeRepository.findByCodeAndDriverIsNull(command.sensorCode());
-
-        if (availableSensorCodes.isEmpty()) {
-            throw new LimitDriverBySensorCodeException(command.sensorCode());
-        }
-
-        SensorCode sensorCodeToAssign = availableSensorCodes.get(0);
-        Supervisor supervisor = sensorCodeToAssign.getSupervisor();
         /// Create the driver object
-        Driver driver = new Driver(command, supervisor);
+        Driver driver = new Driver(command);
 
         /// Create the user object
         User user = driver.getUser();
@@ -89,10 +62,6 @@ public class DriverCommandServiceImp implements DriverCommandService {
         /// Assign the user to the driver
         driver.setUser(savedUser);
         Driver savedDriver = driverRepository.save(driver);
-
-        /// Assign the driver to the sensor code
-        sensorCodeToAssign.setDriver(savedDriver);
-        sensorCodeRepository.save(sensorCodeToAssign);
 
         return Optional.of(savedDriver);
     }

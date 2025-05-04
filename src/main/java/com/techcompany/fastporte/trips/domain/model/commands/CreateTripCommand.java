@@ -4,7 +4,7 @@ import java.time.LocalDate;
 
 public record CreateTripCommand(
     Long driverId,
-    Long supervisorId,
+    Long clientId,
     String origin,
     String destination,
     String type,

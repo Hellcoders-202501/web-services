@@ -11,7 +11,7 @@ public class CreateSafetyThresholdCommandFromResourceAssembler {
                 resource.maxThreshold(),
                 resource.minThreshold(),
                 resource.tripId(),
-                resource.supervisorId()
+                resource.clientId()
         );
     }
 }

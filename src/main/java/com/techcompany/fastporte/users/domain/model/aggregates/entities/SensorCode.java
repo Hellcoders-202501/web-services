@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 
+/*
 @Entity
 @Data
 @Table(name = "sensor_code")
@@ -34,3 +35,4 @@ public class SensorCode implements Serializable {
         this.supervisor = supervisor;
     }
 }
+*/

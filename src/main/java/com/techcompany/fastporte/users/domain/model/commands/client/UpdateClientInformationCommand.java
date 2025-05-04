@@ -1,6 +1,6 @@
-package com.techcompany.fastporte.users.interfaces.rest.resources;
+package com.techcompany.fastporte.users.domain.model.commands.client;
 
-public record UpdateSupervisorInformationResource(
+public record UpdateClientInformationCommand(
         Long id,
         String name,
         String firstLastName,

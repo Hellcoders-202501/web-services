@@ -7,7 +7,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 public interface TripRepository extends JpaRepository<Trip, Long> {
@@ -15,8 +14,8 @@ public interface TripRepository extends JpaRepository<Trip, Long> {
     List<Trip> findAllByDriverId(Long id);
     List<Trip> findAllByDriverIdAndStatus_Id(Long driverId, Long statusId);
 
-    List<Trip> findAllBySupervisorId(Long id);
-    List<Trip> findAllBySupervisorIdAndStatus_Id(Long supervisorId, Long statusId);
+    List<Trip> findAllByClientId(Long id);
+    List<Trip> findAllByClientIdAndStatus_Id(Long clientId, Long statusId);
 
     List<Trip> findAllByDriverIdIn(List<Long> driverIds);
     List<Trip> findAllByStatus_Id (Long statusId);

@@ -1,7 +1,7 @@
 package com.techcompany.fastporte.users.domain.model.aggregates.entities;
 
 import com.techcompany.fastporte.users.domain.model.commands.driver.RegisterDriverCommand;
-import com.techcompany.fastporte.users.domain.model.commands.supervisor.RegisterSupervisorCommand;
+import com.techcompany.fastporte.users.domain.model.commands.client.RegisterClientCommand;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -66,7 +66,7 @@ public class User implements Serializable {
         this.createdAt = new Date();
     }
 
-    public User(RegisterSupervisorCommand command) {
+    public User(RegisterClientCommand command) {
         this.name = command.name();
         this.firstLastName = command.firstLastName();
         this.secondLastName = command.secondLastName();

@@ -4,7 +4,6 @@ import com.techcompany.fastporte.users.domain.model.aggregates.entities.Driver;
 import com.techcompany.fastporte.users.domain.model.aggregates.entities.UserDetailsImp;
 import com.techcompany.fastporte.users.domain.model.commands.driver.DeleteDriverCommand;
 import com.techcompany.fastporte.users.domain.model.queries.driver.GetAllDriversByIdInList;
-import com.techcompany.fastporte.users.domain.model.queries.driver.GetAllDriversBySupervisorIdQuery;
 import com.techcompany.fastporte.users.domain.model.queries.driver.GetAllDriversQuery;
 import com.techcompany.fastporte.users.domain.model.queries.driver.GetDriverByIdQuery;
 import com.techcompany.fastporte.users.domain.services.driver.DriverCommandService;
@@ -42,7 +41,7 @@ public class DriverController {
     }
 
     @Operation(summary = "Get a driver by ID", description = "Retrieves the details of a specific driver by their ID.")
-    @PreAuthorize("hasRole('ROLE_DRIVER') or hasRole('ROLE_SUPERVISOR') or hasRole('ROLE_ADMIN') ")
+    @PreAuthorize("hasRole('ROLE_DRIVER') or hasRole('ROLE_CLIENT') or hasRole('ROLE_ADMIN') ")
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> findById(@PathVariable Long id, @AuthenticationPrincipal UserDetailsImp userDetails) {
 
@@ -62,7 +61,7 @@ public class DriverController {
     }
 
     @Operation(summary = "Get all drivers", description = "Retrieves a list of all drivers.")
-    @PreAuthorize("hasRole('ROLE_DRIVER') or hasRole('ROLE_SUPERVISOR') or hasRole('ROLE_ADMIN') ")
+    @PreAuthorize("hasRole('ROLE_DRIVER') or hasRole('ROLE_CLIENT') or hasRole('ROLE_ADMIN') ")
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<DriverInformationResource>> findAll() {
         try{
@@ -96,10 +95,10 @@ public class DriverController {
         return ResponseEntity.ok(driverInformationResources);
     }
 
-    /*@GetMapping(value = "/supervisor/{supervisorId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<DriverInformationResource>> findAllBySupervisorId(@PathVariable Long supervisorId) {
+    /*@GetMapping(value = "/supervisor/{clientId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<DriverInformationResource>> findAllBySupervisorId(@PathVariable Long clientId) {
         try{
-            List<Driver> drivers = driverQueryService.handle(new GetAllDriversBySupervisorIdQuery(supervisorId));
+            List<Driver> drivers = driverQueryService.handle(new GetAllDriversBySupervisorIdQuery(clientId));
 
             if (drivers.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);

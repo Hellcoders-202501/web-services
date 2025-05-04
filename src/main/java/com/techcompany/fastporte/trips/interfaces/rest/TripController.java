@@ -27,7 +27,7 @@ import java.util.Optional;
 @CrossOrigin
 @RestController
 @RequestMapping("/api/v1/trips")
-@PreAuthorize("hasRole('ROLE_SUPERVISOR') or hasRole('ROLE_DRIVER') or hasRole('ROLE_ADMIN')")
+@PreAuthorize("hasRole('ROLE_CLIENT') or hasRole('ROLE_DRIVER') or hasRole('ROLE_ADMIN')")
 @Tag(name = "Trip Management", description = "Operations related to managing trips")
 public class TripController {
 
@@ -72,11 +72,11 @@ public class TripController {
         }
     }
 
-    @Operation(summary = "Get trips by supervisor", description = "Retrieves all trips managed by the specified supervisor.")
-    @GetMapping(value = "/supervisor/{supervisorId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<TripInformationResource>> findBySupervisorId(@PathVariable Long supervisorId) {
+    @Operation(summary = "Get trips by client", description = "Retrieves all trips managed by the specified client.")
+    @GetMapping(value = "/client/{clientId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<TripInformationResource>> findByClientId(@PathVariable Long clientId) {
         try {
-            List<Trip> trips = tripQueryService.handle(new GetTripsBySupervisorIdQuery(supervisorId));
+            List<Trip> trips = tripQueryService.handle(new GetTripsByClientIdQuery(clientId));
 
             if (trips.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
@@ -126,11 +126,11 @@ public class TripController {
         }
     }
 
-    @Operation(summary = "Get trips by supervisor and status", description = "Retrieves trips for a supervisor filtered by the specified status.")
-    @GetMapping(value = "/supervisor/{supervisorId}/status/{statusId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<TripInformationResource>> findBySupervisorIdAndStatus(@PathVariable Long supervisorId, @PathVariable Long statusId) {
+    @Operation(summary = "Get trips by client and status", description = "Retrieves trips for a client filtered by the specified status.")
+    @GetMapping(value = "/client/{clientId}/status/{statusId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<TripInformationResource>> findByClientIdAndStatus(@PathVariable Long clientId, @PathVariable Long statusId) {
         try {
-            List<Trip> trips = tripQueryService.handle(new GetTripsBySupervisorIdAndStatusQuery(supervisorId, statusId));
+            List<Trip> trips = tripQueryService.handle(new GetTripsByClientIdAndStatusQuery(clientId, statusId));
 
             if (trips.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NO_CONTENT).build();

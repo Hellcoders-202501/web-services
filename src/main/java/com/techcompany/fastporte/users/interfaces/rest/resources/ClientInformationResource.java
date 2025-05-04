@@ -1,6 +1,6 @@
 package com.techcompany.fastporte.users.interfaces.rest.resources;
 
-public record SupervisorInformationResource(
+public record ClientInformationResource(
     Long id,
     String name,
     String firstLastName,

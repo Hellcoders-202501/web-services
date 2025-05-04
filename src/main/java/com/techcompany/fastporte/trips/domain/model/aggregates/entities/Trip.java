@@ -2,7 +2,7 @@ package com.techcompany.fastporte.trips.domain.model.aggregates.entities;
 
 import com.techcompany.fastporte.trips.domain.model.commands.CreateTripCommand;
 import com.techcompany.fastporte.users.domain.model.aggregates.entities.Driver;
-import com.techcompany.fastporte.users.domain.model.aggregates.entities.Supervisor;
+import com.techcompany.fastporte.users.domain.model.aggregates.entities.Client;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.time.LocalTime;
 
 @Entity
 @Data
@@ -43,8 +42,8 @@ public class Trip implements Serializable {
     private Driver driver;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "supervisor_id")
-    private Supervisor supervisor;
+    @JoinColumn(name = "client_id")
+    private Client client;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "status_id")
@@ -82,7 +81,7 @@ public class Trip implements Serializable {
         this.driver = driver;
     }
 
-    public void assignSupervisor(Supervisor supervisor) {
-        this.supervisor = supervisor;
+    public void assignClient(Client client) {
+        this.client = client;
     }
 }

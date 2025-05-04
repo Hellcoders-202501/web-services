@@ -44,8 +44,8 @@ public class TripQueryServiceImp implements TripQueryService {
     }
 
     @Override
-    public List<Trip> handle(GetTripsBySupervisorIdQuery query) {
-        return tripRepository.findAllBySupervisorId(query.supervisorId());
+    public List<Trip> handle(GetTripsByClientIdQuery query) {
+        return tripRepository.findAllByClientId(query.clientId());
     }
 
     @Override
@@ -59,7 +59,7 @@ public class TripQueryServiceImp implements TripQueryService {
     }
 
     @Override
-    public List<Trip> handle(GetTripsBySupervisorIdAndStatusQuery query) {
-        return tripRepository.findAllBySupervisorIdAndStatus_Id(query.supervisorId(), query.statusId());
+    public List<Trip> handle(GetTripsByClientIdAndStatusQuery query) {
+        return tripRepository.findAllByClientIdAndStatus_Id(query.clientId(), query.statusId());
     }
 }

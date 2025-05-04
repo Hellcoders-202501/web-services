@@ -8,7 +8,6 @@ public record DriverInformationResource(
     String email,
     String phone,
     String username,
-    Long supervisorId,
     Long userId
 ) {
 }

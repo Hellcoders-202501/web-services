@@ -26,14 +26,7 @@ public class Driver implements Serializable {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "supervisor_id")
-    private Supervisor supervisor;
-
-    public Driver(RegisterDriverCommand command, Supervisor supervisor) {
-
+    public Driver(RegisterDriverCommand command) {
         this.user = new User(command);
-        this.supervisor = supervisor;
-        //this.plate = command.plate();
     }
 }

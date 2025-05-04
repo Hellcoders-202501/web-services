@@ -1,6 +1,6 @@
 package com.techcompany.fastporte.shared.dtos;
 
-public record SupervisorInformationDto(
+public record ClientInformationDto(
         Long id,
         String name,
         String firstLastName,

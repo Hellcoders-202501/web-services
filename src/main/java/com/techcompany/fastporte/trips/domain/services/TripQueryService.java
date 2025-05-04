@@ -13,10 +13,10 @@ public interface TripQueryService {
     Boolean handle(CheckTripExistsByIdQuery query);
 
     //List<Trip> findAllByStatus(Long statusId);
-    //List<Trip> findAllByDriverIdAndSupervisorId(Long driverId, Long supervisorId);
+    //List<Trip> findAllByDriverIdAndSupervisorId(Long driverId, Long clientId);
 
-    List<Trip> handle(GetTripsBySupervisorIdQuery query);
+    List<Trip> handle(GetTripsByClientIdQuery query);
     List<Trip> handle(GetTripsByDriverIdQuery query);
     List<Trip> handle(GetTripsByDriverIdAndStatusQuery query);
-    List<Trip> handle(GetTripsBySupervisorIdAndStatusQuery query);
+    List<Trip> handle(GetTripsByClientIdAndStatusQuery query);
 }

@@ -1,5 +1,5 @@
 package com.techcompany.fastporte.security.interfaces.rest;
-
+/*
 import com.techcompany.fastporte.security.domain.model.aggregates.entities.SafetyThreshold;
 import com.techcompany.fastporte.security.domain.model.commands.CreateSafetyThresholdCommand;
 import com.techcompany.fastporte.security.domain.model.commands.UpdateSafetyThresholdCommand;
@@ -37,7 +37,7 @@ public class ThresholdController {
         this.safetyThresholdQueryService = safetyThresholdQueryService;
     }
 
-    /*
+
     @Operation(summary = "Get thresholds by trip ID", description = "Retrieves the thresholds associated with the specified trip ID.")
     @GetMapping("/trip/{tripId}")
     public ResponseEntity<List<SafetyThresholdInformationResource>> getThresholdsByTripId(@PathVariable Long tripId) {
@@ -100,5 +100,6 @@ public class ThresholdController {
         }
 
     }
-    */
+
 }
+*/

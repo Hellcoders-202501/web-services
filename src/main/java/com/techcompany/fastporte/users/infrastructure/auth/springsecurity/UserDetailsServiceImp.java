@@ -1,12 +1,12 @@
 package com.techcompany.fastporte.users.infrastructure.auth.springsecurity;
 
 import com.techcompany.fastporte.users.domain.model.aggregates.entities.Driver;
-import com.techcompany.fastporte.users.domain.model.aggregates.entities.Supervisor;
+import com.techcompany.fastporte.users.domain.model.aggregates.entities.Client;
 import com.techcompany.fastporte.users.domain.model.aggregates.entities.User;
 import com.techcompany.fastporte.users.domain.model.aggregates.entities.UserDetailsImp;
 import com.techcompany.fastporte.users.domain.model.exceptions.InvalidCredentialsException;
 import com.techcompany.fastporte.users.infrastructure.persistence.jpa.DriverRepository;
-import com.techcompany.fastporte.users.infrastructure.persistence.jpa.SupervisorRepository;
+import com.techcompany.fastporte.users.infrastructure.persistence.jpa.ClientRepository;
 import com.techcompany.fastporte.users.infrastructure.persistence.jpa.UserRepository;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -22,12 +22,12 @@ public class UserDetailsServiceImp implements UserDetailsService {
 
     private final UserRepository userRepository;
     private final DriverRepository driverRepository;
-    private final SupervisorRepository supervisorRepository;
+    private final ClientRepository clientRepository;
 
-    public UserDetailsServiceImp(UserRepository userRepository, DriverRepository driverRepository, SupervisorRepository supervisorRepository) {
+    public UserDetailsServiceImp(UserRepository userRepository, DriverRepository driverRepository, ClientRepository clientRepository) {
         this.userRepository = userRepository;
         this.driverRepository = driverRepository;
-        this.supervisorRepository = supervisorRepository;
+        this.clientRepository = clientRepository;
     }
 
     /// This method is used to load user by username or email.
@@ -60,10 +60,10 @@ public class UserDetailsServiceImp implements UserDetailsService {
                 return new UserDetailsImp(_username, _password, _driver.get().getId(), authorities);
             }
 
-            // If user is a supervisor
-            Optional<Supervisor> _supervisor = supervisorRepository.findByUserId(user.get().getId());
-            if (_supervisor.isPresent()) {
-                return new UserDetailsImp(_username, _password, _supervisor.get().getId(), authorities);
+            // If user is a client
+            Optional<Client> _client = clientRepository.findByUserId(user.get().getId());
+            if (_client.isPresent()) {
+                return new UserDetailsImp(_username, _password, _client.get().getId(), authorities);
             }
 
             //Set first argument if you want to use email as username

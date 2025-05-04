@@ -24,8 +24,8 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
     }
 
-    @ExceptionHandler(SupervisorNotFoundException.class)
-    public ResponseEntity<Map<String, String>> handleSupervisorNotFoundException(SupervisorNotFoundException ex) {
+    @ExceptionHandler(ClientNotFoundException.class)
+    public ResponseEntity<Map<String, String>> handleClientNotFoundException(ClientNotFoundException ex) {
         Map<String, String> errors = new HashMap<>();
         errors.put("message", ex.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errors);
@@ -52,6 +52,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errors);
     }
 
+    /*
     @ExceptionHandler(SensorCodeAlreadyExistsException.class)
     public ResponseEntity<Map<String, String>> handleSensorCodeAlreadyExistsException(SensorCodeAlreadyExistsException ex) {
         Map<String, String> errors = new HashMap<>();
@@ -72,4 +73,5 @@ public class GlobalExceptionHandler {
         errors.put("message", ex.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errors);
     }
+    */
 }

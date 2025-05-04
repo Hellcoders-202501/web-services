@@ -2,7 +2,6 @@ package com.techcompany.fastporte.security.application.internal.commandservices;
 
 import com.techcompany.fastporte.security.domain.model.aggregates.entities.SafetyThreshold;
 import com.techcompany.fastporte.security.domain.model.aggregates.entities.SensorType;
-import com.techcompany.fastporte.security.domain.model.aggregates.enums.Type;
 import com.techcompany.fastporte.security.domain.model.commands.CreateSafetyThresholdCommand;
 import com.techcompany.fastporte.security.domain.model.commands.UpdateSafetyThresholdCommand;
 import com.techcompany.fastporte.security.domain.services.SafetyThresholdCommandService;
@@ -67,7 +66,7 @@ public class SafetyThresholdCommandServiceImp implements SafetyThresholdCommandS
                 //.minThreshold(minThreshold)
                 .minThreshold(command.minThreshold())
                 .tripId(command.tripId())
-                .supervisorId(command.supervisorId())
+                .clientId(command.clientId())
                 .build();
 
         return Optional.of(safetyThresholdRepository.save(safetyThreshold));

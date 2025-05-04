@@ -3,7 +3,7 @@ package com.techcompany.fastporte.trips.infrastructure.websocket;
 import com.techcompany.fastporte.users.domain.model.aggregates.enums.RoleName;
 import com.techcompany.fastporte.users.infrastructure.auth.jwt.JwtUtil;
 import com.techcompany.fastporte.users.infrastructure.persistence.jpa.DriverRepository;
-import com.techcompany.fastporte.users.infrastructure.persistence.jpa.SupervisorRepository;
+import com.techcompany.fastporte.users.infrastructure.persistence.jpa.ClientRepository;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
@@ -20,12 +20,12 @@ public class NotificationWebSocketHandler extends TextWebSocketHandler {
     // Mapa de sesiones activas por usuario
     private final ConcurrentHashMap<Long, CopyOnWriteArrayList<WebSocketSession>> userSessions = new ConcurrentHashMap<>();
     private final DriverRepository driverRepository;
-    private final SupervisorRepository supervisorRepository;
+    private final ClientRepository clientRepository;
     private final JwtUtil jwtUtil;
 
-    public NotificationWebSocketHandler(DriverRepository driverRepository, SupervisorRepository supervisorRepository, JwtUtil jwtUtil) {
+    public NotificationWebSocketHandler(DriverRepository driverRepository, ClientRepository clientRepository, JwtUtil jwtUtil) {
         this.driverRepository = driverRepository;
-        this.supervisorRepository = supervisorRepository;
+        this.clientRepository = clientRepository;
         this.jwtUtil = jwtUtil;
     }
 
@@ -90,8 +90,8 @@ public class NotificationWebSocketHandler extends TextWebSocketHandler {
         if (role.equals(RoleName.ROLE_DRIVER)) {
             return driverRepository.findById(userId).get().getUser().getId();
 
-        } else if (role.equals(RoleName.ROLE_SUPERVISOR)) {
-            return supervisorRepository.findById(userId).get().getUser().getId();
+        } else if (role.equals(RoleName.ROLE_CLIENT)) {
+            return clientRepository.findById(userId).get().getUser().getId();
         } else {
             throw new RuntimeException("Error: El rol del usuario no es válido");
 

@@ -5,6 +5,6 @@ public record CreateSafetyThresholdCommand(
         Double maxThreshold,
         Double minThreshold,
         Long tripId,
-        Long supervisorId
+        Long clientId
 ) {
 }

@@ -29,5 +29,5 @@ public class SafetyThreshold  implements Serializable {
 
     private Long tripId;
 
-    private Long supervisorId;
+    private Long clientId;
 }
