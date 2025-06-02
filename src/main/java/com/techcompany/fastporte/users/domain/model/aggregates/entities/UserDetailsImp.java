@@ -56,7 +56,7 @@ public class UserDetailsImp implements UserDetails {
 
     public Map<String, String> getClaims() {
         return Map.of(
-                "username", username
+                "email", username
         );
     }
 }

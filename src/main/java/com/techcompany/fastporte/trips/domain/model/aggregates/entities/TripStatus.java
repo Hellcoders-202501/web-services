@@ -1,6 +1,6 @@
 package com.techcompany.fastporte.trips.domain.model.aggregates.entities;
 
-import com.techcompany.fastporte.trips.domain.model.aggregates.enums.Status;
+import com.techcompany.fastporte.trips.domain.model.aggregates.enums.TripStatusType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -21,5 +21,5 @@ public class TripStatus implements Serializable {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", unique = true, nullable = false)
-    private Status status;
+    private TripStatusType status;
 }

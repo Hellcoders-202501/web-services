@@ -8,10 +8,6 @@ public record RegisterDriverCommand(
     String secondLastName,
     String email,
     String phone,
-    String username,
-    String password,
-    //Long clientId,
-    String plate
+    String password
     ) {
-
 }

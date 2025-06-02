@@ -8,8 +8,8 @@ public record NotificationDto(
         Long id,
         LocalDateTime timestamp,
         NotificationType type,
+        Long referenceId,
         boolean seen,
-        Long userId,
-        Long tripId
+        Long userId
 ) {
 }

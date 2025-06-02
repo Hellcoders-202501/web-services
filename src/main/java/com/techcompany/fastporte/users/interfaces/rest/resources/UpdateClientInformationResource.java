@@ -5,7 +5,7 @@ public record UpdateClientInformationResource(
         String name,
         String firstLastName,
         String secondLastName,
-        String email,
-        String phone
+        String phone,
+        String description
 ) {
 }

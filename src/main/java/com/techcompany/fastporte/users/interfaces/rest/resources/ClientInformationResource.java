@@ -7,7 +7,7 @@ public record ClientInformationResource(
     String secondLastName,
     String email,
     String phone,
-    String username,
+    String description,
     Long userId
 )
 {

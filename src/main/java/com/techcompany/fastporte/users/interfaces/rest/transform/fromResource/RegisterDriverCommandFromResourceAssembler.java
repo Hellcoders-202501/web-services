@@ -11,10 +11,8 @@ public class RegisterDriverCommandFromResourceAssembler {
                 resource.secondLastName(),
                 resource.email(),
                 resource.phone(),
-                resource.username(),
-                resource.password(),
-                //resource.clientId(),
-                resource.plate()
+                //resource.email(),
+                resource.password()
         );
     }
 }

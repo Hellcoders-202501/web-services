@@ -13,7 +13,7 @@ public class ClientInformationResourceFromEntityAssembler {
                 client.getUser().getSecondLastName(),
                 client.getUser().getEmail(),
                 client.getUser().getPhone(),
-                client.getUser().getUsername(),
+                client.getUser().getDescription(),
                 client.getUser().getId()
         );
     }

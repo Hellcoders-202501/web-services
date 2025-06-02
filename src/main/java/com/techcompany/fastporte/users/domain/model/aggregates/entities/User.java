@@ -1,5 +1,6 @@
 package com.techcompany.fastporte.users.domain.model.aggregates.entities;
 
+import com.techcompany.fastporte.trips.domain.model.aggregates.entities.Notification;
 import com.techcompany.fastporte.users.domain.model.commands.driver.RegisterDriverCommand;
 import com.techcompany.fastporte.users.domain.model.commands.client.RegisterClientCommand;
 import jakarta.persistence.*;
@@ -8,9 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @Data
@@ -37,8 +36,11 @@ public class User implements Serializable {
     @Column(name = "phone")
     private String phone;
 
-    @Column(name = "username", nullable = false, length = 50)
-    private String username;
+    @Column(name = "description")
+    private String description;
+
+    @Column(name = "image_url")
+    private String imageUrl;
 
     @Column(name = "password", nullable = false)
     private String password;
@@ -55,13 +57,15 @@ public class User implements Serializable {
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles = new HashSet<>();
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Notification> notifications;
+
     public User(RegisterDriverCommand command) {
         this.name = command.name();
         this.firstLastName = command.firstLastName();
         this.secondLastName = command.secondLastName();
         this.email = command.email();
         this.phone = command.phone();
-        this.username = command.username();
         this.password = command.password();
         this.createdAt = new Date();
     }
@@ -72,7 +76,6 @@ public class User implements Serializable {
         this.secondLastName = command.secondLastName();
         this.email = command.email();
         this.phone = command.phone();
-        this.username = command.username();
         this.password = command.password();
         this.createdAt = new Date();
     }

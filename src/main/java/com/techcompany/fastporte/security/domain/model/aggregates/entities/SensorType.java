@@ -1,7 +1,6 @@
 package com.techcompany.fastporte.security.domain.model.aggregates.entities;
 
 import com.techcompany.fastporte.security.domain.model.aggregates.enums.Type;
-import com.techcompany.fastporte.trips.domain.model.aggregates.enums.Status;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;

@@ -11,7 +11,7 @@ public class RegisterClientCommandFromResourceAssembler {
                 resource.secondLastName(),
                 resource.email(),
                 resource.phone(),
-                resource.username(),
+                //resource.email(),
                 resource.password()
         );
     }

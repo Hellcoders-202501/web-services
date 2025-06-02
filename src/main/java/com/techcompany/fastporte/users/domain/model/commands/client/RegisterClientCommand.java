@@ -6,7 +6,6 @@ public record RegisterClientCommand(
         String secondLastName,
         String email,
         String phone,
-        String username,
         String password
 ) {
 }

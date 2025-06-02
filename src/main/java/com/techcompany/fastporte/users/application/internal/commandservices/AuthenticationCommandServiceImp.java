@@ -27,8 +27,8 @@ public class AuthenticationCommandServiceImp implements AuthenticationCommandSer
 
     @Override
     public String handle(AuthenticateAccountCommand command) {
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(command.username(), command.password()));
-        final UserDetailsImp userDetails = (UserDetailsImp) userDetailsService.loadUserByUsername(command.username());
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(command.email(), command.password()));
+        final UserDetailsImp userDetails = (UserDetailsImp) userDetailsService.loadUserByUsername(command.email());
 
         String role = userDetails.getAuthorities().stream()
                 .findFirst()

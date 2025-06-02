@@ -20,18 +20,11 @@ public class Client implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "department", length = 50)
-    private String department;
-
     @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
     private User user;
-/*
-    @OneToMany(mappedBy = "client", fetch = FetchType.LAZY)
-    private List<Driver> drivers;
-*/
+
     public Client(RegisterClientCommand command) {
         this.user = new User(command);
-        //this.department = command.department();
     }
 }

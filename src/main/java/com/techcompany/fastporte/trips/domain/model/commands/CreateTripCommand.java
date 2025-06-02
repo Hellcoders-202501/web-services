@@ -8,7 +8,7 @@ public record CreateTripCommand(
     String origin,
     String destination,
     String type,
-    String amount,
+    Double amount,
     String weight,
     LocalDate date,
     String startTime,

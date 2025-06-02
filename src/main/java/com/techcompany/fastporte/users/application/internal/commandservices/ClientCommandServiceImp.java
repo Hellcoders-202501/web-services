@@ -80,8 +80,8 @@ public class ClientCommandServiceImp implements ClientCommandService {
         user.setName(command.name());
         user.setFirstLastName(command.firstLastName());
         user.setSecondLastName(command.secondLastName());
-        user.setEmail(command.email());
         user.setPhone(command.phone());
+        user.setDescription(command.description());
 
         return Optional.of(clientRepository.save(client));
     }

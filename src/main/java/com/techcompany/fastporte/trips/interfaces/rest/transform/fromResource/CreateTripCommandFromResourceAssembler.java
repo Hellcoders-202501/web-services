@@ -6,6 +6,7 @@ import com.techcompany.fastporte.trips.interfaces.rest.resources.CreateTripResou
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
+/*
 public class CreateTripCommandFromResourceAssembler {
     public static CreateTripCommand toCommandFromResource(CreateTripResource resource) {
 
@@ -32,3 +33,4 @@ public class CreateTripCommandFromResourceAssembler {
         );
     }
 }
+*/

@@ -8,11 +8,11 @@ public class NotificationInformationResourceFromEntityAssembler {
     public static NotificationInformationResource fromEntity(Notification notificationInformation) {
         return new NotificationInformationResource(
             notificationInformation.getId(),
-            notificationInformation.getTimestamp(),
+            notificationInformation.getCreatedAt(),
             notificationInformation.getType(),
             notificationInformation.isSeen(),
             notificationInformation.getUser().getId(),
-            notificationInformation.getTrip().getId()
+            notificationInformation.getReferenceId()
         );
     }
 

@@ -5,7 +5,7 @@ public record UpdateDriverInformationResource(
         String name,
         String firstLastName,
         String secondLastName,
-        String email,
-        String phone
+        String phone,
+        String description
 ) {
 }

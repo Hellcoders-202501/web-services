@@ -7,7 +7,7 @@ public class TripStatusResourceFromEntityAssembler {
     public static TripStatusResource fromEntity(TripStatus tripStatus) {
         return new TripStatusResource(
                 tripStatus.getId(),
-                tripStatus.getStatus().toString()
+                tripStatus.getStatus().name()
         );
     }
 }

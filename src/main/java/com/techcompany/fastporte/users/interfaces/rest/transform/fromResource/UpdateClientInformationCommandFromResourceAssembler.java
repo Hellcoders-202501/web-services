@@ -10,8 +10,8 @@ public class UpdateClientInformationCommandFromResourceAssembler {
                 resource.name(),
                 resource.firstLastName(),
                 resource.secondLastName(),
-                resource.email(),
-                resource.phone()
+                resource.phone(),
+                resource.description()
         );
     }
 }

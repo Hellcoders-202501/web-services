@@ -4,17 +4,13 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 public record CreateTripResource(
-        @NotNull(message = "Driver ID is required") Long driverId,
-        @NotNull(message = "Client ID is required") Long clientId,
-        @NotBlank(message = "Origin is required") String origin,
-        @NotBlank(message = "Destination is required") String destination,
-        @NotBlank(message = "Type is required") String type,
-        @NotBlank(message = "Amount is required") String amount,
-        @NotBlank(message = "Weight is required") String weight,
-        @NotBlank(message = "Date is required") String date,
-        @NotBlank(message = "Start time is required") String startTime,
-        @NotBlank(message = "End time is required") String endTime,
-        String subject,
+        @NotBlank(message = "El origen es requerido") String origin,
+        @NotBlank(message = "El destino es requerido") String destination,
+        @NotBlank(message = "La fecha es requerida") String date,
+        @NotBlank(message = "La hora de inicio es requerida") String startTime,
+        @NotBlank(message = "La hora de fin es requerida") String endTime,
+        @NotBlank(message = "El monto (S/.) es requerido") Double amount,
+        @NotBlank(message = "El asunto es requerido") String subject,
         String description
 ) {
 }

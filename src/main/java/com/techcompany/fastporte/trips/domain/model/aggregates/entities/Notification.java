@@ -24,12 +24,15 @@ public class Notification implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, name = "timestamp")
-    private LocalDateTime timestamp;
+    @Column(nullable = false, name = "created_at")
+    private LocalDateTime createdAt;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, name = "notification_type")
+    @Column(nullable = false, name = "type")
     private NotificationType type;
+
+    @Column(name = "reference_id")
+    private Long referenceId;
 
     @Column(nullable = false, name = "seen")
     private boolean seen;
@@ -38,18 +41,18 @@ public class Notification implements Serializable {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "trip_id")
-    private Trip trip;
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "trip_id")
+//    private Trip trip;
 
     public NotificationDto toDto() {
         return new NotificationDto(
                 id,
-                timestamp,
+                createdAt,
                 type,
+                referenceId,
                 seen,
-                user.getId(),
-                trip != null ? trip.getId() : null
+                user.getId()
         );
     }
 

@@ -1,8 +1,6 @@
 package com.techcompany.fastporte.trips.domain.model.aggregates.entities;
 
 import com.techcompany.fastporte.trips.domain.model.commands.CreateTripCommand;
-import com.techcompany.fastporte.users.domain.model.aggregates.entities.Driver;
-import com.techcompany.fastporte.users.domain.model.aggregates.entities.Client;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -37,26 +35,8 @@ public class Trip implements Serializable {
     @Column(name = "end_time")
     private String endTime;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "driver_id")
-    private Driver driver;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "client_id")
-    private Client client;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "status_id")
-    private TripStatus status;
-
-    @Column(name = "type")
-    private String type;
-
     @Column(name = "amount")
-    private String amount;
-
-    @Column(name = "weight")
-    private String weight;
+    private Double amount;
 
     @Column(name = "subject")
     private String subject;
@@ -64,24 +44,25 @@ public class Trip implements Serializable {
     @Column(name = "description")
     private String description;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "status_id")
+    private TripStatus status;
+
+    @OneToOne
+    @JoinColumn(name = "request_id")
+    private Request request;
+
+    @OneToOne(mappedBy = "trip", cascade = CascadeType.ALL)
+    private Comment comment;
+
     public Trip(CreateTripCommand command) {
         this.origin = command.origin();
         this.destination = command.destination();
+        this.date = command.date();
         this.startTime = command.startTime();
         this.endTime = command.endTime();
-        this.date = command.date();
-        this.type = command.type();
         this.amount = command.amount();
-        this.weight = command.weight();
         this.subject = command.subject();
         this.description = command.description();
-    }
-
-    public void assignDriver(Driver driver) {
-        this.driver = driver;
-    }
-
-    public void assignClient(Client client) {
-        this.client = client;
     }
 }

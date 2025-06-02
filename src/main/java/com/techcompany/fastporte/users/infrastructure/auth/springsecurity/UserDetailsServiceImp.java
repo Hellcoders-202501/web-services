@@ -30,16 +30,16 @@ public class UserDetailsServiceImp implements UserDetailsService {
         this.clientRepository = clientRepository;
     }
 
-    /// This method is used to load user by username or email.
-    /// In this case, we are using email as username.
+    /// This method is used to load user by email or email.
+    /// In this case, we are using email as email.
     @Override
     public UserDetailsImp loadUserByUsername(String username) {
 
         //Find user by email
         Optional<User> user = userRepository.findByEmail(username);
 
-        //Find user by username
-        //Optional<User> driver = userRepository.findByUsername(username);
+        //Find user by email
+        //Optional<User> driver = userRepository.findByUsername(email);
 
         if (user.isPresent()) {
 
@@ -66,7 +66,7 @@ public class UserDetailsServiceImp implements UserDetailsService {
                 return new UserDetailsImp(_username, _password, _client.get().getId(), authorities);
             }
 
-            //Set first argument if you want to use email as username
+            //Set first argument if you want to use email as email
             //return new UserDetailsImp(user.get().getEmail(), user.get().getPassword(), user.get().getId(), authorities);
             throw new InvalidCredentialsException();
 

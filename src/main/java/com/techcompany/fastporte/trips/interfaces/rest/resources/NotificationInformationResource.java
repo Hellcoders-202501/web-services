@@ -10,6 +10,6 @@ public record NotificationInformationResource(
     NotificationType type,
     boolean seen,
     Long userId,
-    Long tripId
+    Long referenceId
 ) {
 }
