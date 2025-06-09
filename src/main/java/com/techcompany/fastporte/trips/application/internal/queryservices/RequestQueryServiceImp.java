@@ -30,7 +30,7 @@ public class RequestQueryServiceImp implements RequestQueryService {
 
     @Override
     public List<Request> handle(GetAllRequestsByClientIdAndNotTakenQuery query) {
-        return List.of();
+        return requestRepository.findAllByClient_IdAndStatus_StatusIsNot(query.clientId(), RequestStatusType.TAKEN);
     }
 
     @Override
