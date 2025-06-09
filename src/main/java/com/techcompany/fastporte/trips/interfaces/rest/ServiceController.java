@@ -1,5 +1,6 @@
 package com.techcompany.fastporte.trips.interfaces.rest;
 
+import com.techcompany.fastporte.shared.exception.ErrorResponse;
 import com.techcompany.fastporte.trips.domain.model.aggregates.entities.Service;
 import com.techcompany.fastporte.trips.domain.model.queries.GetAllServiceTypesQuery;
 import com.techcompany.fastporte.trips.domain.services.ServiceQueryService;
@@ -41,7 +42,7 @@ public class ServiceController {
             }
 
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e.getMessage()));
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.techcompany.fastporte.users.interfaces.rest;
 
+import com.techcompany.fastporte.shared.exception.ErrorResponse;
 import com.techcompany.fastporte.shared.transform.DriverSummaryResourceFromEntityAssembler;
 import com.techcompany.fastporte.trips.domain.model.aggregates.entities.Comment;
 import com.techcompany.fastporte.users.domain.model.aggregates.entities.Driver;
@@ -67,14 +68,14 @@ public class DriverController {
             }
 
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e.getMessage()));
         }
     }
 
     @Operation(summary = "Get all drivers", description = "Retrieves a list of all drivers.")
     @PreAuthorize("hasRole('ROLE_DRIVER') or hasRole('ROLE_CLIENT') or hasRole('ROLE_ADMIN') ")
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<DriverInformationResource>> findAll() {
+    public ResponseEntity<?> findAll() {
         try{
             List<Driver> drivers = driverQueryService.handle(new GetAllDriversQuery());
 
@@ -89,7 +90,7 @@ public class DriverController {
                 return ResponseEntity.status(HttpStatus.OK).body(driverInformationResources);
             }
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e.getMessage()));
         }
     }
 
@@ -129,7 +130,7 @@ public class DriverController {
     @Operation(summary = "Delete a driver by ID", description = "Deletes the driver with the specified ID.")
     @PreAuthorize("hasRole('ROLE_DRIVER') or hasRole('ROLE_ADMIN')")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
+    public ResponseEntity<?> delete(@PathVariable Long id) {
         try {
             if (driverQueryService.handle(new GetDriverByIdQuery(id)).isPresent()) {
                 driverCommandService.handle(new DeleteDriverCommand(id));
@@ -139,7 +140,7 @@ public class DriverController {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
             }
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e.getMessage()));
         }
     }
 
@@ -164,7 +165,7 @@ public class DriverController {
             }
 
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e.getMessage()));
         }
     }
 
@@ -177,7 +178,7 @@ public class DriverController {
 
         } catch (Exception e) {
 
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e.getMessage()));
         }
     }
 
@@ -190,7 +191,7 @@ public class DriverController {
 
         } catch (Exception e) {
 
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e.getMessage()));
         }
     }
 
@@ -215,7 +216,7 @@ public class DriverController {
             }
 
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e.getMessage()));
         }
     }
 
@@ -228,7 +229,7 @@ public class DriverController {
 
         } catch (Exception e) {
 
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e.getMessage()));
         }
     }
 
@@ -240,7 +241,7 @@ public class DriverController {
             return ResponseEntity.status(HttpStatus.OK).build();
 
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e.getMessage()));
         }
     }
 
@@ -265,7 +266,7 @@ public class DriverController {
             }
 
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e.getMessage()));
         }
     }
 
@@ -290,7 +291,7 @@ public class DriverController {
             }
 
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e.getMessage()));
         }
     }
 

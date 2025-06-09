@@ -7,12 +7,13 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Entity
 @Data
 @Table(name = "contract")
 @AllArgsConstructor
-@NoArgsConstructor
 public class Contract implements Serializable {
 
     @Id
@@ -27,8 +28,15 @@ public class Contract implements Serializable {
     @JoinColumn(name = "driver_id")
     private Driver driver;
 
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
     @OneToOne(mappedBy = "contract")
     //@JoinColumn(name = "payment_id")
     private Payment payment;
+
+    public Contract() {
+        this.createdAt = LocalDateTime.now().withNano(0);
+    }
 
 }

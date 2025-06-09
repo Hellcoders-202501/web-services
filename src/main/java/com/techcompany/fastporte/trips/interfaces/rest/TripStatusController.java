@@ -1,5 +1,6 @@
 package com.techcompany.fastporte.trips.interfaces.rest;
 
+import com.techcompany.fastporte.shared.exception.ErrorResponse;
 import com.techcompany.fastporte.trips.domain.model.aggregates.entities.TripStatus;
 import com.techcompany.fastporte.trips.domain.model.queries.GetAllTripStatusQuery;
 import com.techcompany.fastporte.trips.domain.services.TripStatusQueryService;
@@ -31,7 +32,7 @@ public class TripStatusController {
 
     @Operation(summary = "Get all trip statuses", description = "Retrieves a list of all possible statuses for trips.")
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<TripStatusResource>> getAllTripStatus() {
+    public ResponseEntity<?> getAllTripStatus() {
         try{
             List<TripStatus> tripStatusList = tripStatusQueryService.handle(new GetAllTripStatusQuery());
 
@@ -47,7 +48,7 @@ public class TripStatusController {
 
         }catch (Exception e){
             System.out.println(e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e.getMessage()));
         }
 
 

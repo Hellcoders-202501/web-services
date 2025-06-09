@@ -8,13 +8,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Entity
 @Data
 @Table(name = "request")
 @AllArgsConstructor
-@NoArgsConstructor
 public class Request implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,21 +29,24 @@ public class Request implements Serializable {
     @JoinColumn(name = "service_id")
     private Service service;
 
-//    @Enumerated(EnumType.STRING)
-//    @Column(nullable = false, name = "status")
-//    private RequestStatusType status;
-
     @ManyToOne
     @JoinColumn(name = "status", nullable = false)
     private RequestStatus status;
 
-    @OneToOne(mappedBy = "request")
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
+    @OneToOne(mappedBy = "request", cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
     private Trip trip;
 
-    @OneToOne(mappedBy = "request")
+    @OneToOne(mappedBy = "request", cascade = CascadeType.REMOVE)
     private Contract contract;
 
-    @OneToMany(mappedBy = "request")
+    @OneToMany(mappedBy = "request", cascade = CascadeType.REMOVE)
     private List<Application> applications;
+
+    public Request() {
+        this.createdAt = LocalDateTime.now().withNano(0);
+    }
 
 }

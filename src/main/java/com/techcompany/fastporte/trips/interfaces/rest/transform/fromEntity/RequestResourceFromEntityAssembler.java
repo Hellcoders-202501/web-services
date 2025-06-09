@@ -14,9 +14,8 @@ public class RequestResourceFromEntityAssembler {
     public static RequestResource toResourceFromEntity(Request request) {
 
         Client client = request.getClient();
-        User clientUser = client.getUser();
         Trip trip = request.getTrip();
-        Contract contract = request.getContract();
+        Contract contract = request.getContract() == null ? null : request.getContract();
 
         return new RequestResource(
                 request.getId(),
@@ -24,7 +23,7 @@ public class RequestResourceFromEntityAssembler {
                 new ServiceResource(request.getService().getId(), request.getService().getNameSpanish()),
                 request.getStatus().getStatus().name(),
                 TripInformationResourceFromEntityAssembler.toResourceFromEntity(trip),
-                ContractResourceFromEntityAssembler.toResourceFromEntity(contract)
+                contract == null ? null : ContractResourceFromEntityAssembler.toResourceFromEntity(contract)
         );
     }
 }

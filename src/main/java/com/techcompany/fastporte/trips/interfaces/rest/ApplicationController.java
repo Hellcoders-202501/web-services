@@ -1,5 +1,6 @@
 package com.techcompany.fastporte.trips.interfaces.rest;
 
+import com.techcompany.fastporte.shared.exception.ErrorResponse;
 import com.techcompany.fastporte.trips.domain.model.aggregates.entities.Application;
 import com.techcompany.fastporte.trips.domain.model.queries.GetAllApplicationsByRequestIdQuery;
 import com.techcompany.fastporte.trips.domain.services.ApplicationCommandService;
@@ -39,7 +40,7 @@ public class ApplicationController {
             return new ResponseEntity<>(HttpStatus.OK);
 
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e.getMessage()));
         }
     }
 
@@ -53,16 +54,17 @@ public class ApplicationController {
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
             }else {
 
-                var applicationResources = applications.stream()
-                        .map(ApplicationResourceFromEntityAssembler::toResourceFromEntity)
-                        .toList();
+                var applicationResources = ApplicationResourceFromEntityAssembler.toResourceFromEntity(applications);
+//                        applications.stream()
+//                        .map(ApplicationResourceFromEntityAssembler::toResourceFromEntity)
+//                        .toList();
 
                 return ResponseEntity.status(HttpStatus.OK).body(applicationResources);
             }
 
 
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e.getMessage()));
         }
     }
 

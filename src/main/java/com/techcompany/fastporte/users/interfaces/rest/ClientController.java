@@ -1,5 +1,6 @@
 package com.techcompany.fastporte.users.interfaces.rest;
 
+import com.techcompany.fastporte.shared.exception.ErrorResponse;
 import com.techcompany.fastporte.users.domain.model.aggregates.entities.Client;
 import com.techcompany.fastporte.users.domain.model.commands.client.DeleteClientCommand;
 import com.techcompany.fastporte.users.domain.model.queries.client.GetAllClientsQuery;
@@ -44,7 +45,7 @@ public class ClientController {
     @Operation(summary = "Get a client by ID", description = "Retrieves the details of a specific client by their ID.")
     @PreAuthorize("hasRole('ROLE_CLIENT') or hasRole('ROLE_DRIVER') or hasRole('ROLE_ADMIN')")
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ClientInformationResource> findById(@PathVariable Long id) {
+    public ResponseEntity<?> findById(@PathVariable Long id) {
 
         try {
             Optional<Client> client = clientQueryService.handle(new GetClientByIdQuery(id));
@@ -53,14 +54,14 @@ public class ClientController {
                     .orElseGet(() -> ResponseEntity.notFound().build());
 
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e.getMessage()));
         }
     }
 
     @Operation(summary = "Get all clients", description = "Retrieves a list of all clients.")
     @PreAuthorize("hasRole('ROLE_CLIENT') or hasRole('ROLE_DRIVER') or hasRole('ROLE_ADMIN')")
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<ClientInformationResource>> findAll() {
+    public ResponseEntity<?> findAll() {
         try {
             List<Client> clients = clientQueryService.handle(new GetAllClientsQuery());
 
@@ -74,7 +75,7 @@ public class ClientController {
                 return ResponseEntity.status(HttpStatus.OK).body(clientInformationResources);
             }
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e.getMessage()));
         }
     }
 
@@ -101,7 +102,7 @@ public class ClientController {
     @Operation(summary = "Delete a client by ID", description = "Deletes the client with the specified ID.")
     @PreAuthorize("hasRole('ROLE_CLIENT') or hasRole('ROLE_DRIVER') or hasRole('ROLE_ADMIN')")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
+    public ResponseEntity<?> delete(@PathVariable Long id) {
         try {
             if (clientQueryService.handle(new GetClientByIdQuery(id)).isPresent()) {
                 clientCommandService.handle(new DeleteClientCommand(id));
@@ -111,7 +112,7 @@ public class ClientController {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
             }
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e.getMessage()));
         }
     }
 

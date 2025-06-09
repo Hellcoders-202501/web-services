@@ -1,5 +1,6 @@
 package com.techcompany.fastporte.trips.interfaces.rest;
 
+import com.techcompany.fastporte.shared.exception.ErrorResponse;
 import com.techcompany.fastporte.trips.domain.model.aggregates.entities.Comment;
 import com.techcompany.fastporte.trips.domain.model.aggregates.entities.Request;
 import com.techcompany.fastporte.trips.domain.model.commands.*;
@@ -44,7 +45,7 @@ public class TripController {
                     .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body(null));
         } catch (Exception e) {
             System.out.println(e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e.getMessage()));
         }
     }
 
@@ -63,7 +64,7 @@ public class TripController {
             }
         } catch (Exception e) {
             System.out.println(e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e.getMessage()));
         }
     }
 
@@ -81,7 +82,7 @@ public class TripController {
                 return ResponseEntity.status(HttpStatus.OK).body(requestResources);
             }
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e.getMessage()));
         }
     }
 
@@ -99,7 +100,7 @@ public class TripController {
                 return ResponseEntity.status(HttpStatus.OK).body(requestResources);
             }
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e.getMessage()));
         }
     }
 
@@ -117,7 +118,7 @@ public class TripController {
                 return ResponseEntity.status(HttpStatus.OK).body(requestResources);
             }
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e.getMessage()));
         }
     }
 
@@ -135,7 +136,7 @@ public class TripController {
                 return ResponseEntity.status(HttpStatus.OK).body(requestResources);
             }
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e.getMessage()));
         }
     }
 
@@ -154,7 +155,7 @@ public class TripController {
 
     @Operation(summary = "Delete a trip by ID", description = "Deletes the trip with the given ID.")
     @DeleteMapping(value = "/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
+    public ResponseEntity<?> delete(@PathVariable Long id) {
         try {
             if (tripQueryService.handle(new CheckTripExistsByIdQuery(id))) {
                 tripCommandService.handle(new DeleteTripCommand(id));
@@ -163,13 +164,13 @@ public class TripController {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
             }
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e.getMessage()));
         }
     }
 
     @Operation(summary = "Start a trip", description = "Marks the trip with the given ID as started.")
     @PostMapping(value = "/{id}/starts")
-    public ResponseEntity<Void> start(@PathVariable Long id) {
+    public ResponseEntity<?> start(@PathVariable Long id) {
         try {
             if (tripQueryService.handle(new CheckTripExistsByIdQuery(id))) {
                 tripCommandService.handle(new StartTripCommand(id));
@@ -178,13 +179,13 @@ public class TripController {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
             }
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e.getMessage()));
         }
     }
 
     @Operation(summary = "Finish a trip by driver", description = "Marks the trip with the given ID as completed by driver.")
     @PostMapping(value = "/{id}/finish-by-driver")
-    public ResponseEntity<Void> finishByDriver(@PathVariable Long id) {
+    public ResponseEntity<?> finishByDriver(@PathVariable Long id) {
         try {
             if (tripQueryService.handle(new CheckTripExistsByIdQuery(id))) {
                 tripCommandService.handle(new FinishTripByDriverCommand(id));
@@ -193,13 +194,13 @@ public class TripController {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
             }
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e.getMessage()));
         }
     }
 
     @Operation(summary = "Finish a trip by client", description = "Marks the trip with the given ID as completed by client.")
     @PostMapping(value = "/{id}/finish-by-client")
-    public ResponseEntity<Void> finishByClient(@PathVariable Long id) {
+    public ResponseEntity<?> finishByClient(@PathVariable Long id) {
         try {
             if (tripQueryService.handle(new CheckTripExistsByIdQuery(id))) {
                 tripCommandService.handle(new FinishTripByClientCommand(id));
@@ -208,7 +209,7 @@ public class TripController {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
             }
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e.getMessage()));
         }
     }
 
@@ -237,7 +238,7 @@ public class TripController {
             return ResponseEntity.status(HttpStatus.OK).build();
 
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e.getMessage()));
         }
     }
 }

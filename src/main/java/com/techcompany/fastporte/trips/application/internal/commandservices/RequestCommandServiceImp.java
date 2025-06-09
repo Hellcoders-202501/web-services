@@ -53,9 +53,12 @@ public class RequestCommandServiceImp implements RequestCommandService {
             request.setClient(client.get());
             request.setService(service.get());
             request.setStatus(requestStatus.get());
-            request.setTrip(command.trip());
             request.setContract(null);
             request.setApplications(null);
+
+            Trip trip = command.trip();
+            trip.setRequest(request);
+            request.setTrip(trip);
 
             return Optional.of(requestRepository.save(request));
 
