@@ -1,5 +1,6 @@
 package com.techcompany.fastporte.trips.application.internal.commandservices;
 
+import com.techcompany.fastporte.shared.utils.Helper;
 import com.techcompany.fastporte.trips.domain.model.aggregates.entities.*;
 import com.techcompany.fastporte.trips.domain.model.aggregates.enums.PaymentStatusType;
 import com.techcompany.fastporte.trips.domain.model.aggregates.enums.RequestStatusType;
@@ -12,6 +13,12 @@ import com.techcompany.fastporte.users.infrastructure.persistence.jpa.DriverRepo
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 @Transactional
 public class ContractCommandServiceImp implements ContractCommandService {
@@ -22,15 +29,17 @@ public class ContractCommandServiceImp implements ContractCommandService {
     private final ApplicationRepository applicationRepository;
     private final PaymentStatusRepository paymentStatusRepository;
     private final RequestStatusRepository requestStatusRepository;
+    private final TripRepository tripRepository;
     private final TripStatusRepository tripStatusRepository;
 
-    public ContractCommandServiceImp(ContractRepository contractRepository, RequestRepository requestRepository, DriverRepository driverRepository, PaymentRepository paymentRepository, ApplicationRepository applicationRepository, PaymentStatusRepository paymentStatusRepository, RequestStatusRepository requestStatusRepository, TripStatusRepository tripStatusRepository) {
+    public ContractCommandServiceImp(ContractRepository contractRepository, RequestRepository requestRepository, DriverRepository driverRepository, PaymentRepository paymentRepository, ApplicationRepository applicationRepository, PaymentStatusRepository paymentStatusRepository, RequestStatusRepository requestStatusRepository, TripRepository tripRepository, TripStatusRepository tripStatusRepository) {
         this.contractRepository = contractRepository;
         this.requestRepository = requestRepository;
         this.paymentRepository = paymentRepository;
         this.applicationRepository = applicationRepository;
         this.paymentStatusRepository = paymentStatusRepository;
         this.requestStatusRepository = requestStatusRepository;
+        this.tripRepository = tripRepository;
         this.tripStatusRepository = tripStatusRepository;
     }
 
@@ -45,6 +54,19 @@ public class ContractCommandServiceImp implements ContractCommandService {
 
         Request request = application.getRequest();
         Driver driver = application.getDriver();
+
+        /// Verificar que el conductor no tenga contratos en el horario de la solicitud a la que va a aplicar
+        List<Trip> tripsList = tripRepository.findAllByRequest_Contract_Driver_IdAndStatus_StatusIsNotAndStatus_StatusIsNotNull(driver.getId(), TripStatusType.COMPLETED);
+
+        LocalDateTime requestStart = LocalDateTime.of(request.getTrip().getDate(), LocalTime.parse(request.getTrip().getStartTime()));
+        LocalDateTime requestEnd = LocalDateTime.of(request.getTrip().getDate(), LocalTime.parse(request.getTrip().getEndTime()));
+
+        List<Long> overlappingRequestIds = Helper.VerifyOverlappingRequests(tripsList, requestStart, requestEnd);
+
+        if (!overlappingRequestIds.isEmpty()) {
+
+            throw new RuntimeException("El conductor actualmente tiene viajes pendientes en el horario de la solicitud.");
+        }
 
         ///  Cambiar estado de solicitud a TAKEN
         RequestStatus requestStatus = requestStatusRepository.findByStatusEquals(RequestStatusType.TAKEN).get();

@@ -1,6 +1,7 @@
 package com.techcompany.fastporte.trips.infrastructure.persistence.jpa;
 
 import com.techcompany.fastporte.trips.domain.model.aggregates.entities.Trip;
+import com.techcompany.fastporte.trips.domain.model.aggregates.enums.TripStatusType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -11,14 +12,8 @@ import java.util.List;
 @Repository
 public interface TripRepository extends JpaRepository<Trip, Long> {
 
-//    List<Trip> findAllByDriverId(Long id);
-//    List<Trip> findAllByDriverIdAndStatus_Id(Long driverId, Long statusId);
-//
-//    List<Trip> findAllByClientId(Long id);
-//    List<Trip> findAllByClientIdAndStatus_Id(Long clientId, Long statusId);
-//
-//    List<Trip> findAllByDriverIdIn(List<Long> driverIds);
     List<Trip> findAllByStatus_Id (Long statusId);
+    List<Trip> findAllByRequest_Contract_Driver_IdAndStatus_StatusIsNotAndStatus_StatusIsNotNull(Long driverId, TripStatusType status);
 
     @Modifying
     @Query("update Trip t set t.status.id = ?2 where t.id = ?1")

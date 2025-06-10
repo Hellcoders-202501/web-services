@@ -2,6 +2,7 @@ package com.techcompany.fastporte.shared.exception;
 
 import lombok.Data;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Data
 public class ErrorResponse {
@@ -10,6 +11,9 @@ public class ErrorResponse {
 
     public ErrorResponse(String message) {
         this.message = message;
-        this.timestamp = LocalDateTime.now().withNano(0).toString();
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        this.timestamp = LocalDateTime.now().withNano(0).format(formatter);
+
     }
 }
