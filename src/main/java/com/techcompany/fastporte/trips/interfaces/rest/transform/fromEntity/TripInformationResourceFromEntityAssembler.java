@@ -12,7 +12,7 @@ public class TripInformationResourceFromEntityAssembler {
     public static TripInformationResource toResourceFromEntity(Trip trip){
 
         String date = trip.getDate() == null ? "" : trip.getDate().toString();
-        String status = trip.getStatus() == null ? null : trip.getStatus().toString();
+        String status = trip.getStatus() == null ? null : trip.getStatus().getStatus().name();
 
         return new TripInformationResource(
                 trip.getId(),
