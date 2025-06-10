@@ -4,6 +4,7 @@ import com.techcompany.fastporte.trips.domain.model.aggregates.entities.Applicat
 import com.techcompany.fastporte.trips.domain.model.aggregates.entities.Request;
 import com.techcompany.fastporte.trips.domain.model.aggregates.enums.RequestStatusType;
 import com.techcompany.fastporte.trips.domain.model.commands.ApplyToRequestCommand;
+import com.techcompany.fastporte.trips.domain.model.commands.DeleteApplicationCommand;
 import com.techcompany.fastporte.trips.domain.services.ApplicationCommandService;
 import com.techcompany.fastporte.trips.infrastructure.persistence.jpa.ApplicationRepository;
 import com.techcompany.fastporte.trips.infrastructure.persistence.jpa.RequestRepository;
@@ -47,5 +48,19 @@ public class ApplicationCommandServiceImp implements ApplicationCommandService {
 
         applicationRepository.save(application);
         //Todo: Agregar notificacion
+    }
+
+    @Override
+    public void handle(DeleteApplicationCommand command) {
+
+        Application application = applicationRepository.findById(command.id()).orElse(null);
+
+        if (application == null) {
+            throw new RuntimeException("La aplicación para esta solicitud no existe. Id: " + command.id());
+        }
+
+        applicationRepository.deleteById(command.id());
+
+        //Todo: Agregar notificación
     }
 }

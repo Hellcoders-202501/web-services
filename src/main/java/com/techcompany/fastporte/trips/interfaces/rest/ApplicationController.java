@@ -2,6 +2,7 @@ package com.techcompany.fastporte.trips.interfaces.rest;
 
 import com.techcompany.fastporte.shared.exception.ErrorResponse;
 import com.techcompany.fastporte.trips.domain.model.aggregates.entities.Application;
+import com.techcompany.fastporte.trips.domain.model.commands.DeleteApplicationCommand;
 import com.techcompany.fastporte.trips.domain.model.queries.GetAllApplicationsByRequestIdQuery;
 import com.techcompany.fastporte.trips.domain.services.ApplicationCommandService;
 import com.techcompany.fastporte.trips.domain.services.ApplicationQueryService;
@@ -62,6 +63,18 @@ public class ApplicationController {
                 return ResponseEntity.status(HttpStatus.OK).body(applicationResources);
             }
 
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e.getMessage()));
+        }
+    }
+
+    @DeleteMapping(path = "/{id}")
+    public ResponseEntity<?> DeleteApplication(@PathVariable("id") Long id) {
+        try {
+
+            applicationCommandService.handle(new DeleteApplicationCommand(id));
+            return new ResponseEntity<>(HttpStatus.OK);
 
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e.getMessage()));
