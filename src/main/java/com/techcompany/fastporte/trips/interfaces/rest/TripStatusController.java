@@ -1,10 +1,10 @@
 package com.techcompany.fastporte.trips.interfaces.rest;
 
-import com.techcompany.fastporte.shared.exception.ErrorResponse;
+import com.techcompany.fastporte.shared.response.ErrorResponse;
+import com.techcompany.fastporte.shared.response.SuccessResponse;
 import com.techcompany.fastporte.trips.domain.model.aggregates.entities.TripStatus;
 import com.techcompany.fastporte.trips.domain.model.queries.GetAllTripStatusQuery;
 import com.techcompany.fastporte.trips.domain.services.TripStatusQueryService;
-import com.techcompany.fastporte.trips.interfaces.rest.resources.TripStatusResource;
 import com.techcompany.fastporte.trips.interfaces.rest.transform.fromEntity.TripStatusResourceFromEntityAssembler;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -37,8 +37,11 @@ public class TripStatusController {
             List<TripStatus> tripStatusList = tripStatusQueryService.handle(new GetAllTripStatusQuery());
 
             if (tripStatusList.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+
+                return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new SuccessResponse("Estados de viaje no encontrados"));
+
             } else {
+
                 var tripStatusResourceList = tripStatusList.stream()
                         .map(TripStatusResourceFromEntityAssembler::fromEntity)
                         .toList();
@@ -47,8 +50,7 @@ public class TripStatusController {
             }
 
         }catch (Exception e){
-            System.out.println(e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e.getMessage()));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e));
         }
 
 

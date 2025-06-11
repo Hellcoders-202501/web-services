@@ -1,12 +1,12 @@
 package com.techcompany.fastporte.trips.interfaces.rest;
 
-import com.techcompany.fastporte.shared.exception.ErrorResponse;
+import com.techcompany.fastporte.shared.response.ErrorResponse;
+import com.techcompany.fastporte.shared.response.SuccessResponse;
 import com.techcompany.fastporte.trips.domain.model.aggregates.entities.Application;
 import com.techcompany.fastporte.trips.domain.model.commands.DeleteApplicationCommand;
 import com.techcompany.fastporte.trips.domain.model.queries.GetAllApplicationsByRequestIdQuery;
 import com.techcompany.fastporte.trips.domain.services.ApplicationCommandService;
 import com.techcompany.fastporte.trips.domain.services.ApplicationQueryService;
-import com.techcompany.fastporte.trips.interfaces.rest.resources.ApplicationResource;
 import com.techcompany.fastporte.trips.interfaces.rest.resources.ApplyToRequestResource;
 import com.techcompany.fastporte.trips.interfaces.rest.transform.fromEntity.ApplicationResourceFromEntityAssembler;
 import com.techcompany.fastporte.trips.interfaces.rest.transform.fromResource.ApplyToRequestCommandFromResourceAssembler;
@@ -38,10 +38,10 @@ public class ApplicationController {
         try {
 
             applicationCommandService.handle(ApplyToRequestCommandFromResourceAssembler.toCommandFromResource(resource));
-            return new ResponseEntity<>(HttpStatus.OK);
+            return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse("Se aplicó a la solicitud exitosamente"));
 
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e.getMessage()));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e));
         }
     }
 
@@ -52,20 +52,16 @@ public class ApplicationController {
             List<Application> applications = applicationQueryService.handle(new GetAllApplicationsByRequestIdQuery(requestId));
 
             if (applications.isEmpty()) {
-                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+                return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new SuccessResponse("Sin registros"));
             }else {
 
                 var applicationResources = ApplicationResourceFromEntityAssembler.toResourceFromEntity(applications);
-//                        applications.stream()
-//                        .map(ApplicationResourceFromEntityAssembler::toResourceFromEntity)
-//                        .toList();
-
                 return ResponseEntity.status(HttpStatus.OK).body(applicationResources);
             }
 
 
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e.getMessage()));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e));
         }
     }
 
@@ -74,10 +70,10 @@ public class ApplicationController {
         try {
 
             applicationCommandService.handle(new DeleteApplicationCommand(id));
-            return new ResponseEntity<>(HttpStatus.OK);
+            return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse("Aplicación eliminada"));
 
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e.getMessage()));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e));
         }
     }
 

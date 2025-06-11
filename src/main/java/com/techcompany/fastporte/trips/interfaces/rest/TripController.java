@@ -1,12 +1,14 @@
 package com.techcompany.fastporte.trips.interfaces.rest;
 
-import com.techcompany.fastporte.shared.exception.ErrorResponse;
-import com.techcompany.fastporte.trips.domain.model.aggregates.entities.Comment;
+import com.techcompany.fastporte.shared.response.ErrorResponse;
+import com.techcompany.fastporte.shared.response.SuccessResponse;
 import com.techcompany.fastporte.trips.domain.model.aggregates.entities.Request;
+import com.techcompany.fastporte.trips.domain.model.aggregates.entities.TripStatus;
 import com.techcompany.fastporte.trips.domain.model.commands.*;
 import com.techcompany.fastporte.trips.domain.model.queries.*;
 import com.techcompany.fastporte.trips.domain.services.TripCommandService;
 import com.techcompany.fastporte.trips.domain.services.TripQueryService;
+import com.techcompany.fastporte.trips.domain.services.TripStatusQueryService;
 import com.techcompany.fastporte.trips.interfaces.rest.resources.AddCommentResource;
 import com.techcompany.fastporte.trips.interfaces.rest.transform.fromEntity.RequestResourceFromEntityAssembler;
 import io.swagger.v3.oas.annotations.Operation;
@@ -18,6 +20,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @CrossOrigin
@@ -29,10 +32,12 @@ public class TripController {
 
     private final TripCommandService tripCommandService;
     private final TripQueryService tripQueryService;
+    private final TripStatusQueryService tripStatusQueryService;
 
-    public TripController(TripCommandService tripCommandService, TripQueryService tripQueryService) {
+    public TripController(TripCommandService tripCommandService, TripQueryService tripQueryService, TripStatusQueryService tripStatusQueryService) {
         this.tripCommandService = tripCommandService;
         this.tripQueryService = tripQueryService;
+        this.tripStatusQueryService = tripStatusQueryService;
     }
 
     @Operation(summary = "Get a trip by ID", description = "Retrieves the details of a specific trip by its ID.")
@@ -41,11 +46,15 @@ public class TripController {
         try {
             Optional<Request> trip = tripQueryService.handle(new GetTripByIdQuery(id));
 
-            return trip.map(value -> ResponseEntity.status(HttpStatus.OK).body(RequestResourceFromEntityAssembler.toResourceFromEntity(value)))
-                    .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body(null));
+            if (trip.isPresent()) {
+                var tripR = RequestResourceFromEntityAssembler.toResourceFromEntity(trip.get());
+                return ResponseEntity.status(HttpStatus.OK).body(tripR);
+            }
+
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new SuccessResponse("Viaje no encontrado"));
+
         } catch (Exception e) {
-            System.out.println(e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e.getMessage()));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e));
         }
     }
 
@@ -56,15 +65,16 @@ public class TripController {
             List<Request> trips = tripQueryService.handle(new GetAllTripsQuery());
 
             if (trips.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-            } else {
-                var requestResources = trips.stream().map(RequestResourceFromEntityAssembler::toResourceFromEntity).toList();
 
+                return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new SuccessResponse("No se encontraron viajes registrados"));
+
+            } else {
+
+                var requestResources = trips.stream().map(RequestResourceFromEntityAssembler::toResourceFromEntity).toList();
                 return ResponseEntity.status(HttpStatus.OK).body(requestResources);
             }
         } catch (Exception e) {
-            System.out.println(e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e.getMessage()));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e));
         }
     }
 
@@ -75,14 +85,14 @@ public class TripController {
             List<Request> trips = tripQueryService.handle(new GetTripsByClientIdQuery(clientId));
 
             if (trips.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+                return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new SuccessResponse("No se encontraron viajes para el cliente"));
             } else {
-                var requestResources = trips.stream().map(RequestResourceFromEntityAssembler::toResourceFromEntity).toList();
 
+                var requestResources = trips.stream().map(RequestResourceFromEntityAssembler::toResourceFromEntity).toList();
                 return ResponseEntity.status(HttpStatus.OK).body(requestResources);
             }
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e.getMessage()));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e));
         }
     }
 
@@ -93,14 +103,14 @@ public class TripController {
             List<Request> trips = tripQueryService.handle(new GetTripsByDriverIdQuery(driverId));
 
             if (trips.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+                return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new SuccessResponse("No se encontraron viajes para el conductor"));
             } else {
-                var requestResources = trips.stream().map(RequestResourceFromEntityAssembler::toResourceFromEntity).toList();
 
+                var requestResources = trips.stream().map(RequestResourceFromEntityAssembler::toResourceFromEntity).toList();
                 return ResponseEntity.status(HttpStatus.OK).body(requestResources);
             }
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e.getMessage()));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e));
         }
     }
 
@@ -111,32 +121,53 @@ public class TripController {
             List<Request> trips = tripQueryService.handle(new GetTripsByDriverIdAndStatusQuery(driverId, statusId));
 
             if (trips.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-            } else {
-                var requestResources = trips.stream().map(RequestResourceFromEntityAssembler::toResourceFromEntity).toList();
 
+                String state = getStringStatus(statusId);;
+                return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new SuccessResponse("No se encontraron viajes con el estado " + state + " para el conductor solicitado"));
+
+            } else {
+
+                var requestResources = trips.stream().map(RequestResourceFromEntityAssembler::toResourceFromEntity).toList();
                 return ResponseEntity.status(HttpStatus.OK).body(requestResources);
             }
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e.getMessage()));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e));
         }
+    }
+
+    private String getStringStatus(@PathVariable Long statusId) {
+
+        List<TripStatus> tripStatuses = tripStatusQueryService.handle(new GetAllTripStatusQuery());
+        TripStatus tS = tripStatuses.stream().filter(t -> t.getId().equals(statusId)).findFirst().orElse(null);
+        return switch (Objects.requireNonNull(tS).getStatus()) {
+            case PENDING -> "PENDIENTE";
+            case STARTED -> "INICIADO";
+            case FINISHED_BY_DRIVER -> "FINALIZADO por conductor";
+            case FINISHED_BY_CLIENT -> "FINALIZADO por cliente";
+            case COMPLETED -> "COMPLETADO";
+            default -> "-----";
+        };
     }
 
     @Operation(summary = "Get trips by client and status", description = "Retrieves trips for a client filtered by the specified status.")
     @GetMapping(value = "/client/{clientId}/status/{statusId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> findByClientIdAndStatus(@PathVariable Long clientId, @PathVariable Long statusId) {
         try {
+
             List<Request> trips = tripQueryService.handle(new GetTripsByClientIdAndStatusQuery(clientId, statusId));
 
             if (trips.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-            } else {
-                var requestResources = trips.stream().map(RequestResourceFromEntityAssembler::toResourceFromEntity).toList();
 
+                String state = getStringStatus(statusId);
+                return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new SuccessResponse("No se encontraron viajes con el estado " + state + " para el cliente solicitado"));
+
+            } else {
+
+                var requestResources = trips.stream().map(RequestResourceFromEntityAssembler::toResourceFromEntity).toList();
                 return ResponseEntity.status(HttpStatus.OK).body(requestResources);
             }
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e.getMessage()));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e));
         }
     }
 
@@ -153,20 +184,20 @@ public class TripController {
 //        }
 //    }
 
-    @Operation(summary = "Delete a trip by ID", description = "Deletes the trip with the given ID.")
-    @DeleteMapping(value = "/{id}")
-    public ResponseEntity<?> delete(@PathVariable Long id) {
-        try {
-            if (tripQueryService.handle(new CheckTripExistsByIdQuery(id))) {
-                tripCommandService.handle(new DeleteTripCommand(id));
-                return ResponseEntity.status(HttpStatus.OK).build();
-            } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-            }
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e.getMessage()));
-        }
-    }
+//    @Operation(summary = "Delete a trip by ID", description = "Deletes the trip with the given ID.")
+//    @DeleteMapping(value = "/{id}")
+//    public ResponseEntity<?> delete(@PathVariable Long id) {
+//        try {
+//            if (tripQueryService.handle(new CheckTripExistsByIdQuery(id))) {
+//                tripCommandService.handle(new DeleteTripCommand(id));
+//                return ResponseEntity.status(HttpStatus.OK).build();
+//            } else {
+//                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+//            }
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e));
+//        }
+//    }
 
     @Operation(summary = "Start a trip", description = "Marks the trip with the given ID as started.")
     @PostMapping(value = "/{id}/starts")
@@ -174,12 +205,12 @@ public class TripController {
         try {
             if (tripQueryService.handle(new CheckTripExistsByIdQuery(id))) {
                 tripCommandService.handle(new StartTripCommand(id));
-                return ResponseEntity.status(HttpStatus.OK).build();
+                return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse("El estado del viaje cambió a INICIADO"));
             } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new SuccessResponse("El viaje a iniciar no existe"));
             }
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e.getMessage()));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e));
         }
     }
 
@@ -189,12 +220,12 @@ public class TripController {
         try {
             if (tripQueryService.handle(new CheckTripExistsByIdQuery(id))) {
                 tripCommandService.handle(new FinishTripByDriverCommand(id));
-                return ResponseEntity.status(HttpStatus.OK).build();
+                return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse("El estado del viaje cambió a FINALIZADO por el conductor"));
             } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new SuccessResponse("El viaje a finalizar no existe"));
             }
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e.getMessage()));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e));
         }
     }
 
@@ -204,12 +235,12 @@ public class TripController {
         try {
             if (tripQueryService.handle(new CheckTripExistsByIdQuery(id))) {
                 tripCommandService.handle(new FinishTripByClientCommand(id));
-                return ResponseEntity.status(HttpStatus.OK).build();
+                return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse("El estado del viaje cambió a FINALIZADO por el cliente"));
             } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new SuccessResponse("El viaje a finalizar no existe"));
             }
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e.getMessage()));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e));
         }
     }
 
@@ -234,11 +265,10 @@ public class TripController {
         try{
 
             tripCommandService.handle(new AddCommentCommand(resource.content(), resource.rating(), resource.tripId()));
-
-            return ResponseEntity.status(HttpStatus.OK).build();
+            return ResponseEntity.status(HttpStatus.CREATED).body(new SuccessResponse("Comentario agregado"));
 
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e.getMessage()));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e));
         }
     }
 }

@@ -1,15 +1,14 @@
 package com.techcompany.fastporte.users.interfaces.rest;
 
-import com.techcompany.fastporte.shared.exception.ErrorResponse;
+import com.techcompany.fastporte.shared.response.ErrorResponse;
+import com.techcompany.fastporte.shared.response.SuccessResponse;
 import com.techcompany.fastporte.users.domain.model.aggregates.entities.Client;
 import com.techcompany.fastporte.users.domain.model.commands.client.DeleteClientCommand;
 import com.techcompany.fastporte.users.domain.model.queries.client.GetAllClientsQuery;
 import com.techcompany.fastporte.users.domain.model.queries.client.GetClientByIdQuery;
-import com.techcompany.fastporte.users.domain.services.driver.DriverQueryService;
 import com.techcompany.fastporte.users.domain.services.client.ClientCommandService;
 import com.techcompany.fastporte.users.domain.services.client.ClientQueryService;
 import com.techcompany.fastporte.users.interfaces.rest.resources.RegisterClientResource;
-import com.techcompany.fastporte.users.interfaces.rest.resources.ClientInformationResource;
 import com.techcompany.fastporte.users.interfaces.rest.resources.UpdateClientInformationResource;
 import com.techcompany.fastporte.users.interfaces.rest.transform.fromEntity.ClientInformationResourceFromEntityAssembler;
 import com.techcompany.fastporte.users.interfaces.rest.transform.fromResource.RegisterClientCommandFromResourceAssembler;
@@ -34,12 +33,10 @@ public class ClientController {
 
     private final ClientCommandService clientCommandService;
     private final ClientQueryService clientQueryService;
-    private final DriverQueryService driverQueryService;
 
-    public ClientController(ClientCommandService clientCommandService, ClientQueryService clientQueryService, DriverQueryService driverQueryService) {
+    public ClientController(ClientCommandService clientCommandService, ClientQueryService clientQueryService) {
         this.clientCommandService = clientCommandService;
         this.clientQueryService = clientQueryService;
-        this.driverQueryService = driverQueryService;
     }
 
     @Operation(summary = "Get a client by ID", description = "Retrieves the details of a specific client by their ID.")
@@ -50,11 +47,16 @@ public class ClientController {
         try {
             Optional<Client> client = clientQueryService.handle(new GetClientByIdQuery(id));
 
-            return client.map(value -> ResponseEntity.ok(ClientInformationResourceFromEntityAssembler.toResourceFromEntity(value)))
-                    .orElseGet(() -> ResponseEntity.notFound().build());
+            if (client.isPresent()) {
+                var clientR = ClientInformationResourceFromEntityAssembler.toResourceFromEntity(client.get());
+                return ResponseEntity.status(HttpStatus.OK).body(clientR);
+
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new SuccessResponse("Cliente no encontrado"));
+            }
 
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e.getMessage()));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e));
         }
     }
 
@@ -66,7 +68,7 @@ public class ClientController {
             List<Client> clients = clientQueryService.handle(new GetAllClientsQuery());
 
             if (clients.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+                return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new SuccessResponse("No se encontraron clientes"));
             } else {
                 var clientInformationResources = clients.stream()
                         .map(ClientInformationResourceFromEntityAssembler::toResourceFromEntity)
@@ -75,27 +77,47 @@ public class ClientController {
                 return ResponseEntity.status(HttpStatus.OK).body(clientInformationResources);
             }
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e.getMessage()));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e));
         }
     }
 
     @Operation(summary = "Create a new client", description = "Creates a new client with the provided details.")
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ClientInformationResource> save(@Valid @RequestBody RegisterClientResource resource) {
+    public ResponseEntity<?> save(@Valid @RequestBody RegisterClientResource resource) {
 
-        Optional<Client> client = clientCommandService.handle(RegisterClientCommandFromResourceAssembler.toCommandFromResource(resource));
-        return client.map(ClientInformationResourceFromEntityAssembler::toResourceFromEntity)
-                .map(clientInformationResource -> ResponseEntity.status(HttpStatus.CREATED).body(clientInformationResource))
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null));
+        try {
+
+            Optional<Client> client = clientCommandService.handle(RegisterClientCommandFromResourceAssembler.toCommandFromResource(resource));
+
+            if (client.isPresent()) {
+                return ResponseEntity.status(HttpStatus.CREATED).body(new SuccessResponse("Cliente registrado con éxito"));
+            } else {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse("No se pudo registrar al cliente. Consultar con Soporte."));
+            }
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e));
+        }
+
     }
 
     @Operation(summary = "Update client information", description = "Updates the details of a client.")
     @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ClientInformationResource> update(@RequestBody UpdateClientInformationResource resource) {
+    public ResponseEntity<?> update(@RequestBody UpdateClientInformationResource resource) {
 
-        Optional<Client> client = clientCommandService.handle(UpdateClientInformationCommandFromResourceAssembler.toCommandFromResource(resource));
-        return client.map(value -> ResponseEntity.status(HttpStatus.CREATED).body(ClientInformationResourceFromEntityAssembler.toResourceFromEntity(value)))
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null));
+        try {
+
+            Optional<Client> client = clientCommandService.handle(UpdateClientInformationCommandFromResourceAssembler.toCommandFromResource(resource));
+
+            if (client.isPresent()) {
+                return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse("Información del cliente actualizada"));
+            } else {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse("La información del cliente no se pudo actualizar. Consultar con Soporte."));
+            }
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e));
+        }
 
     }
 
@@ -107,34 +129,13 @@ public class ClientController {
             if (clientQueryService.handle(new GetClientByIdQuery(id)).isPresent()) {
                 clientCommandService.handle(new DeleteClientCommand(id));
 
-                return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+                return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse("Cliente eliminado"));
             } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new SuccessResponse("Cliente a eliminar no encontrado"));
             }
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e.getMessage()));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e));
         }
     }
 
-    /*
-    @Operation(summary = "Get drivers by client", description = "Retrieves all drivers managed by the specified client.")
-    @GetMapping(value = "/{clientId}/drivers", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<DriverInformationResource>> findAllBySupervisorId(@PathVariable Long clientId) {
-        try{
-            List<Driver> drivers = driverQueryService.handle(new GetAllDriversBySupervisorIdQuery(clientId));
-
-            if (drivers.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
-            } else {
-                var driverInformationResources = drivers.stream()
-                        .map(DriverInformationResourceFromEntityAssembler::toPublicResourceFromEntity)
-                        .toList();
-
-                return ResponseEntity.status(HttpStatus.OK).body(driverInformationResources);
-            }
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-        }
-    }
-    */
 }

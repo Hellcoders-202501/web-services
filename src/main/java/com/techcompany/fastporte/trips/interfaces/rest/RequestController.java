@@ -1,6 +1,7 @@
 package com.techcompany.fastporte.trips.interfaces.rest;
 
-import com.techcompany.fastporte.shared.exception.ErrorResponse;
+import com.techcompany.fastporte.shared.response.ErrorResponse;
+import com.techcompany.fastporte.shared.response.SuccessResponse;
 import com.techcompany.fastporte.trips.domain.model.aggregates.entities.Request;
 import com.techcompany.fastporte.trips.domain.model.commands.DeleteRequestCommand;
 import com.techcompany.fastporte.trips.domain.model.queries.GetAllRequestsByClientIdAndNotTakenQuery;
@@ -18,9 +19,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 @CrossOrigin
@@ -44,19 +43,18 @@ public class RequestController {
             List<Request> requests = requestQueryService.handle(new GetAllRequestsByServiceIdAndNotTakenQuery(serviceId));
 
             if (requests.isEmpty()) {
-                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+                return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new SuccessResponse("Sn registros"));
             } else {
 
                 var requestResources = requests.stream()
                         .map(RequestResourceFromEntityAssembler::toResourceFromEntity)
                         .toList();
 
-                return new ResponseEntity<>(requestResources, HttpStatus.OK);
+                return ResponseEntity.status(HttpStatus.OK).body(requestResources);
             }
 
         }catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e.getMessage()));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e));
         }
 
     }
@@ -66,12 +64,17 @@ public class RequestController {
         try {
             Optional<Request> request = requestQueryService.handle(new GetRequestByIdQuery(id));
 
-            return request.map(RequestResourceFromEntityAssembler::toResourceFromEntity)
-                    .map(requestResource -> ResponseEntity.status(HttpStatus.CREATED).body(requestResource))
-                    .orElseGet(() -> ResponseEntity.status(HttpStatus.BAD_REQUEST).build());
+            if (request.isPresent()) {
+
+                var requestR = RequestResourceFromEntityAssembler.toResourceFromEntity(request.get());
+                return ResponseEntity.status(HttpStatus.OK).body(requestR);
+            }
+            else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new SuccessResponse("Solicitud no encontrada"));
+            }
 
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e.getMessage()));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e));
         }
     }
 
@@ -83,18 +86,18 @@ public class RequestController {
             List<Request> requests = requestQueryService.handle(new GetAllRequestsByClientIdAndNotTakenQuery(clientId));
 
             if (requests.isEmpty()) {
-                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+                return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new SuccessResponse("Sin registros"));
             } else {
 
                 var requestResources = requests.stream()
                         .map(RequestResourceFromEntityAssembler::toResourceFromEntity)
                         .toList();
 
-                return new ResponseEntity<>(requestResources, HttpStatus.OK);
+                return ResponseEntity.status(HttpStatus.OK).body(requestResources);
             }
 
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e.getMessage()));        }
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e));        }
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -102,12 +105,16 @@ public class RequestController {
         try {
 
             Optional<Request> request = requestCommandService.handle(PublishRequestCommandFromResourceAssembler.toCommandFromResource(resource));
-            return request.map(RequestResourceFromEntityAssembler::toResourceFromEntity)
-                    .map(requestResource -> ResponseEntity.status(HttpStatus.CREATED).body(requestResource))
-                    .orElseGet(() -> ResponseEntity.status(HttpStatus.BAD_REQUEST).build());
+
+            if (request.isPresent()) {
+                return ResponseEntity.status(HttpStatus.CREATED).body(new SuccessResponse("Solicitud publicada exitosamente"));
+            }
+             else {
+                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse("No se pudo publicar la solicitud. Consultar con Soporte."));
+            }
 
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e.getMessage()));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e));
         }
     }
 
@@ -117,10 +124,10 @@ public class RequestController {
         try {
 
             requestCommandService.handle(new DeleteRequestCommand(requestId));
-            return ResponseEntity.status(HttpStatus.OK).build();
+            return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse("Solicitud eliminada"));
 
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e.getMessage()));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e));
         }
     }
 }

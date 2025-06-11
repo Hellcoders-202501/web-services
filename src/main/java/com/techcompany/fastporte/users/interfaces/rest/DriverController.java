@@ -1,6 +1,7 @@
 package com.techcompany.fastporte.users.interfaces.rest;
 
-import com.techcompany.fastporte.shared.exception.ErrorResponse;
+import com.techcompany.fastporte.shared.response.ErrorResponse;
+import com.techcompany.fastporte.shared.response.SuccessResponse;
 import com.techcompany.fastporte.shared.transform.DriverSummaryResourceFromEntityAssembler;
 import com.techcompany.fastporte.trips.domain.model.aggregates.entities.Comment;
 import com.techcompany.fastporte.users.domain.model.aggregates.entities.Driver;
@@ -62,13 +63,14 @@ public class DriverController {
             Optional<Driver> driver = driverQueryService.handle(new GetDriverByIdQuery(id));
 
             if (driver.isPresent()) {
-                return ResponseEntity.ok(DriverInformationResourceFromEntityAssembler.toPublicResourceFromEntity(driver.get()));
+                var driverR = DriverInformationResourceFromEntityAssembler.toPublicResourceFromEntity(driver.get());
+                return ResponseEntity.status(HttpStatus.OK).body(driverR);
             } else {
-                return ResponseEntity.notFound().build();
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new SuccessResponse("Cliente no encontrado"));
             }
 
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e.getMessage()));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e));
         }
     }
 
@@ -80,7 +82,7 @@ public class DriverController {
             List<Driver> drivers = driverQueryService.handle(new GetAllDriversQuery());
 
             if (drivers.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+                return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new SuccessResponse("No se encontraron conductores"));
             } else {
 
                 var driverInformationResources = drivers.stream()
@@ -90,41 +92,67 @@ public class DriverController {
                 return ResponseEntity.status(HttpStatus.OK).body(driverInformationResources);
             }
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e.getMessage()));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e));
         }
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping("/batch")
     @Operation(summary = "Get drivers in batch", description = "Retrieves a list of drivers by their IDs.")
-    public ResponseEntity<List<DriverInformationResource>> findAllByIdIn(@RequestBody List<Long> driverIds) {
-        List<Driver> drivers = driverQueryService.handle(new GetAllDriversByIdInList(driverIds));
+    public ResponseEntity<?> findAllByIdIn(@RequestBody List<Long> driverIds) {
 
-        var driverInformationResources = drivers.stream()
-                .map(DriverInformationResourceFromEntityAssembler::toPublicResourceFromEntity)
-                .toList();
+        try {
+            List<Driver> drivers = driverQueryService.handle(new GetAllDriversByIdInList(driverIds));
 
-        return ResponseEntity.ok(driverInformationResources);
+            if (drivers.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new SuccessResponse("No se encontraron conductores"));
+            }
+
+            var driverInformationResources = drivers.stream()
+                    .map(DriverInformationResourceFromEntityAssembler::toPublicResourceFromEntity)
+                    .toList();
+
+            return ResponseEntity.status(HttpStatus.OK).body(driverInformationResources);
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e));
+        }
     }
 
     @Operation(summary = "Create a new driver", description = "Creates a new driver with the provided details.")
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> save(@Valid @RequestBody RegisterDriverResource resource) {
 
-        Optional<Driver> driver = driverCommandService.handle(RegisterDriverCommandFromResourceAssembler.toCommandFromResource(resource));
-        return driver.map(DriverInformationResourceFromEntityAssembler::toPublicResourceFromEntity)
-                .map(driverInformationResource -> ResponseEntity.status(HttpStatus.CREATED).body(driverInformationResource))
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null));
+        try {
+            Optional<Driver> driver = driverCommandService.handle(RegisterDriverCommandFromResourceAssembler.toCommandFromResource(resource));
+
+            if (driver.isPresent()) {
+                return ResponseEntity.status(HttpStatus.CREATED).body(new SuccessResponse("Conductor registrado con éxito"));
+            } else {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse("No se pudo registrar al conductor. Consultar con Soporte."));
+            }
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e));
+        }
     }
 
     @Operation(summary = "Update driver information", description = "Updates the details of a driver.")
     @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> update(@RequestBody UpdateDriverInformationResource resource) {
 
-        Optional<Driver> driver = driverCommandService.handle(UpdateDriverInformationCommandFromResourceAssembler.toCommandFromResource(resource));
-        return driver.map(DriverInformationResourceFromEntityAssembler::toPublicResourceFromEntity)
-                .map(driverInformationResource -> ResponseEntity.status(HttpStatus.OK).body(driverInformationResource))
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null));
+        try {
+            Optional<Driver> driver = driverCommandService.handle(UpdateDriverInformationCommandFromResourceAssembler.toCommandFromResource(resource));
+
+            if (driver.isPresent()) {
+                return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse("Información del conductor actualizada"));
+            } else {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse("La información del conductor no se pudo actualizar. Consultar con Soporte."));
+            }
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e));
+        }
     }
 
     @Operation(summary = "Delete a driver by ID", description = "Deletes the driver with the specified ID.")
@@ -135,12 +163,12 @@ public class DriverController {
             if (driverQueryService.handle(new GetDriverByIdQuery(id)).isPresent()) {
                 driverCommandService.handle(new DeleteDriverCommand(id));
 
-                return ResponseEntity.status(HttpStatus.OK).build();
+                return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse("Conductor eliminado"));
             } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new SuccessResponse("Conductor a eliminar no encontrado"));
             }
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e.getMessage()));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e));
         }
     }
 
@@ -155,7 +183,7 @@ public class DriverController {
             List<Experience> experiences = driverQueryService.handle(new GetAllExperiencesByDriverIdQuery(driverId));
 
             if (experiences.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+                return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new SuccessResponse("Sin experiencias registradas"));
             } else {
                 var driverExperienceResources = experiences.stream()
                         .map(DriverExperienceResourceFromEntityAssembler::toResourceFromEntity)
@@ -165,7 +193,7 @@ public class DriverController {
             }
 
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e.getMessage()));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e));
         }
     }
 
@@ -174,24 +202,24 @@ public class DriverController {
         try {
 
             driverCommandService.handle(AddDriverExperienceCommandFromResourceAssembler.toCommandFromResource(resource));
-            return ResponseEntity.status(HttpStatus.OK).build();
+            return ResponseEntity.status(HttpStatus.CREATED).body(new SuccessResponse("Experiencia agregada"));
 
         } catch (Exception e) {
 
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e.getMessage()));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e));
         }
     }
 
-    @PostMapping("/experience/{experienceId}")
+    @DeleteMapping("/experience/{experienceId}")
     public ResponseEntity<?> deleteExperience(@PathVariable Long experienceId) {
         try {
 
             driverCommandService.handle(new DeleteDriverExperienceCommand(experienceId));
-            return ResponseEntity.status(HttpStatus.OK).build();
+            return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse("Experiencia eliminada"));
 
         } catch (Exception e) {
 
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e.getMessage()));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e));
         }
     }
 
@@ -206,7 +234,7 @@ public class DriverController {
             List<Vehicle> vehicles = driverQueryService.handle(new GetAllVehiclesByDriverIdQuery(driverId));
 
             if (vehicles.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+                return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new SuccessResponse("Sin vehiculos registrados"));
             } else {
                 var driverVehicleResources = vehicles.stream()
                         .map(DriverVehicleResourceFromEntityAssembler::toResourceFromEntity)
@@ -216,7 +244,7 @@ public class DriverController {
             }
 
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e.getMessage()));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e));
         }
     }
 
@@ -225,23 +253,23 @@ public class DriverController {
         try {
 
             driverCommandService.handle(AddDriverVehicleCommandFromResourceAssembler.toCommandFromResource(resource));
-            return ResponseEntity.status(HttpStatus.OK).build();
+            return ResponseEntity.status(HttpStatus.CREATED).body(new SuccessResponse("Vehiculo agregado"));
 
         } catch (Exception e) {
 
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e.getMessage()));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e));
         }
     }
 
-    @PostMapping("/vehicle/{vehicleId}")
+    @DeleteMapping("/vehicle/{vehicleId}")
     public ResponseEntity<?> deleteVehicle(@PathVariable Long vehicleId) {
         try {
 
             driverCommandService.handle(new DeleteDriverVehicleCommand(vehicleId));
-            return ResponseEntity.status(HttpStatus.OK).build();
+            return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse("Vehiculo eliminado"));
 
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e.getMessage()));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e));
         }
     }
 
@@ -256,7 +284,7 @@ public class DriverController {
             List<Comment> comments = driverQueryService.handle(new GetAllCommentsByDriverIdQuery(driverId));
 
             if (comments.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+                return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new SuccessResponse("Sin commentarios registrados"));
             } else {
                 var driverCommentResources = comments.stream()
                         .map(DriverCommentResourceFromEntityAssembler::toResourceFromEntity)
@@ -266,7 +294,7 @@ public class DriverController {
             }
 
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e.getMessage()));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e));
         }
     }
 
@@ -281,7 +309,7 @@ public class DriverController {
             List<Driver> drivers = driverQueryService.handle(new GetMostRankedDriversQuery());
 
             if (drivers.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+                return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new SuccessResponse("Sin registros"));
             } else {
                 var driverSummaryResources = drivers.stream()
                         .map(DriverSummaryResourceFromEntityAssembler::assemble)
@@ -291,7 +319,7 @@ public class DriverController {
             }
 
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e.getMessage()));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e));
         }
     }
 

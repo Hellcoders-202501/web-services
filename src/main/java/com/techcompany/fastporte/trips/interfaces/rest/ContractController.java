@@ -1,6 +1,7 @@
 package com.techcompany.fastporte.trips.interfaces.rest;
 
-import com.techcompany.fastporte.shared.exception.ErrorResponse;
+import com.techcompany.fastporte.shared.response.ErrorResponse;
+import com.techcompany.fastporte.shared.response.SuccessResponse;
 import com.techcompany.fastporte.trips.domain.model.commands.AcceptDriverApplicationCommand;
 import com.techcompany.fastporte.trips.domain.services.ContractCommandService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -26,10 +27,10 @@ public class ContractController {
         try {
 
             contractCommandService.handle(new AcceptDriverApplicationCommand(applicationId));
-            return ResponseEntity.status(HttpStatus.CREATED).build();
+            return ResponseEntity.status(HttpStatus.CREATED).body(new SuccessResponse("Contracto creado exitosamente"));
 
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e.getMessage()));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e));
         }
     }
 
