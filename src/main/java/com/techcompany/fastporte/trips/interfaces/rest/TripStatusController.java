@@ -38,7 +38,7 @@ public class TripStatusController {
 
             if (tripStatusList.isEmpty()) {
 
-                return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new SuccessResponse("Estados de viaje no encontrados"));
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new SuccessResponse("Estados de viaje no encontrados"));
 
             } else {
 

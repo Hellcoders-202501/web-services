@@ -66,7 +66,7 @@ public class TripController {
 
             if (trips.isEmpty()) {
 
-                return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new SuccessResponse("No se encontraron viajes registrados"));
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new SuccessResponse("No se encontraron viajes registrados"));
 
             } else {
 
@@ -85,7 +85,7 @@ public class TripController {
             List<Request> trips = tripQueryService.handle(new GetTripsByClientIdQuery(clientId));
 
             if (trips.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new SuccessResponse("No se encontraron viajes para el cliente"));
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new SuccessResponse("No se encontraron viajes para el cliente"));
             } else {
 
                 var requestResources = trips.stream().map(RequestResourceFromEntityAssembler::toResourceFromEntity).toList();
@@ -103,7 +103,7 @@ public class TripController {
             List<Request> trips = tripQueryService.handle(new GetTripsByDriverIdQuery(driverId));
 
             if (trips.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new SuccessResponse("No se encontraron viajes para el conductor"));
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new SuccessResponse("No se encontraron viajes para el conductor"));
             } else {
 
                 var requestResources = trips.stream().map(RequestResourceFromEntityAssembler::toResourceFromEntity).toList();
@@ -123,7 +123,7 @@ public class TripController {
             if (trips.isEmpty()) {
 
                 String state = getStringStatus(statusId);;
-                return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new SuccessResponse("No se encontraron viajes con el estado " + state + " para el conductor solicitado"));
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new SuccessResponse("No se encontraron viajes con el estado " + state + " para el conductor solicitado"));
 
             } else {
 
@@ -159,7 +159,7 @@ public class TripController {
             if (trips.isEmpty()) {
 
                 String state = getStringStatus(statusId);
-                return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new SuccessResponse("No se encontraron viajes con el estado " + state + " para el cliente solicitado"));
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new SuccessResponse("No se encontraron viajes con el estado " + state + " para el cliente solicitado"));
 
             } else {
 

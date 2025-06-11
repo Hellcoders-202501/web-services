@@ -43,7 +43,7 @@ public class RequestController {
             List<Request> requests = requestQueryService.handle(new GetAllRequestsByServiceIdAndNotTakenQuery(serviceId));
 
             if (requests.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new SuccessResponse("Sn registros"));
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new SuccessResponse("Sin registros"));
             } else {
 
                 var requestResources = requests.stream()
@@ -86,7 +86,7 @@ public class RequestController {
             List<Request> requests = requestQueryService.handle(new GetAllRequestsByClientIdAndNotTakenQuery(clientId));
 
             if (requests.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new SuccessResponse("Sin registros"));
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new SuccessResponse("Sin registros"));
             } else {
 
                 var requestResources = requests.stream()

@@ -82,7 +82,7 @@ public class DriverController {
             List<Driver> drivers = driverQueryService.handle(new GetAllDriversQuery());
 
             if (drivers.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new SuccessResponse("No se encontraron conductores"));
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new SuccessResponse("No se encontraron conductores"));
             } else {
 
                 var driverInformationResources = drivers.stream()
@@ -105,7 +105,7 @@ public class DriverController {
             List<Driver> drivers = driverQueryService.handle(new GetAllDriversByIdInList(driverIds));
 
             if (drivers.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new SuccessResponse("No se encontraron conductores"));
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new SuccessResponse("No se encontraron conductores"));
             }
 
             var driverInformationResources = drivers.stream()
@@ -183,7 +183,7 @@ public class DriverController {
             List<Experience> experiences = driverQueryService.handle(new GetAllExperiencesByDriverIdQuery(driverId));
 
             if (experiences.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new SuccessResponse("Sin experiencias registradas"));
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new SuccessResponse("Sin experiencias registradas"));
             } else {
                 var driverExperienceResources = experiences.stream()
                         .map(DriverExperienceResourceFromEntityAssembler::toResourceFromEntity)
@@ -234,7 +234,7 @@ public class DriverController {
             List<Vehicle> vehicles = driverQueryService.handle(new GetAllVehiclesByDriverIdQuery(driverId));
 
             if (vehicles.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new SuccessResponse("Sin vehiculos registrados"));
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new SuccessResponse("Sin vehiculos registrados"));
             } else {
                 var driverVehicleResources = vehicles.stream()
                         .map(DriverVehicleResourceFromEntityAssembler::toResourceFromEntity)
@@ -284,7 +284,7 @@ public class DriverController {
             List<Comment> comments = driverQueryService.handle(new GetAllCommentsByDriverIdQuery(driverId));
 
             if (comments.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new SuccessResponse("Sin commentarios registrados"));
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new SuccessResponse("Sin commentarios registrados"));
             } else {
                 var driverCommentResources = comments.stream()
                         .map(DriverCommentResourceFromEntityAssembler::toResourceFromEntity)
@@ -309,7 +309,7 @@ public class DriverController {
             List<Driver> drivers = driverQueryService.handle(new GetMostRankedDriversQuery());
 
             if (drivers.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new SuccessResponse("Sin registros"));
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new SuccessResponse("Sin registros"));
             } else {
                 var driverSummaryResources = drivers.stream()
                         .map(DriverSummaryResourceFromEntityAssembler::assemble)

@@ -68,7 +68,7 @@ public class ClientController {
             List<Client> clients = clientQueryService.handle(new GetAllClientsQuery());
 
             if (clients.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new SuccessResponse("No se encontraron clientes"));
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new SuccessResponse("No se encontraron clientes"));
             } else {
                 var clientInformationResources = clients.stream()
                         .map(ClientInformationResourceFromEntityAssembler::toResourceFromEntity)

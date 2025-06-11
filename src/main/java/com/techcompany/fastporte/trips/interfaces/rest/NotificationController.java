@@ -49,7 +49,7 @@ public class NotificationController {
             List<Notification> notifications = notificationQueryService.handle(new GetAllNotificationsByUserIdQuery(userId));
 
             if (notifications.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new SuccessResponse("Sin notificaciones"));
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new SuccessResponse("Sin notificaciones"));
             }
 
             var resourceList =  notifications.stream()

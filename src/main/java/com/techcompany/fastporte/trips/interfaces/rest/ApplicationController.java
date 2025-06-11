@@ -52,7 +52,7 @@ public class ApplicationController {
             List<Application> applications = applicationQueryService.handle(new GetAllApplicationsByRequestIdQuery(requestId));
 
             if (applications.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new SuccessResponse("Sin registros"));
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new SuccessResponse("Sin registros"));
             }else {
 
                 var applicationResources = ApplicationResourceFromEntityAssembler.toResourceFromEntity(applications);

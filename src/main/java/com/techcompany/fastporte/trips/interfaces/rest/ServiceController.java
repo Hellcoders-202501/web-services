@@ -33,7 +33,7 @@ public class ServiceController {
             List<Service> services = serviceQueryService.handle(new GetAllServiceTypesQuery());
 
             if (services.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new SuccessResponse("Tipos de servicio no encontrados"));
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new SuccessResponse("Tipos de servicio no encontrados"));
             } else {
                 var serviceResourceList = services.stream()
                         .map(ServiceResourceFromEntityAssembler::toResourceFromEntity)
