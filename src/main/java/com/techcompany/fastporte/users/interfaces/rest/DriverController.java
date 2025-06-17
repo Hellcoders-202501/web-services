@@ -197,7 +197,7 @@ public class DriverController {
         }
     }
 
-    @PostMapping("/experience")
+    @PostMapping(value = "/experience", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> addExperience(@Valid @RequestBody AddDriverExperienceResource resource) {
         try {
 
