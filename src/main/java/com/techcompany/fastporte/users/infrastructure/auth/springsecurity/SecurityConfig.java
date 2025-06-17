@@ -28,14 +28,15 @@ public class SecurityConfig {
     private final RequestFilter requestFilter;
 
     private static final String[] WHITE_LIST_URL = {
-            "/api/v1/auth",
-            "/api/v1/drivers/**",
-            "/api/v1/drivers/experience",
-            "/api/v1/clients/**",
-            "/v3/api-docs/**",
-            "/swagger-ui/**",
-            "/swagger-ui.html",
-            "/swagger-resources/**",
+//            "/api/v1/auth",
+//            "/api/v1/drivers/**",
+//            "/api/v1/drivers/experience",
+//            "/api/v1/clients/**",
+//            "/v3/api-docs/**",
+//            "/swagger-ui/**",
+//            "/swagger-ui.html",
+//            "/swagger-resources/**",
+            "/**"
     };
 
     public SecurityConfig(RequestFilter requestFilter) {
