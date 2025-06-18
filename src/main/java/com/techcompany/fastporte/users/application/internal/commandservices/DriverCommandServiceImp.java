@@ -112,6 +112,7 @@ public class DriverCommandServiceImp implements DriverCommandService {
                 .orElseThrow(() -> new DriverNotFoundException(command.driverId()));
 
         Vehicle vehicle = new Vehicle(command.brand(), command.imageUrl());
+        vehicle.setDriver(driver);
         driver.getVehicles().add(vehicle);
         driverRepository.save(driver);
 
