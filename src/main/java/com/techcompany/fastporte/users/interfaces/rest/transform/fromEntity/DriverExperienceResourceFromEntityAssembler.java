@@ -7,6 +7,7 @@ public class DriverExperienceResourceFromEntityAssembler {
 
     public static DriverExperienceResource toResourceFromEntity(Experience experience) {
         return new DriverExperienceResource(
+                experience.getId(),
                 experience.getJob(),
                 experience.getDuration()
         );

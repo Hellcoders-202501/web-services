@@ -16,6 +16,7 @@ public class DriverCommentResourceFromEntityAssembler {
         Client client = comment.getTrip().getRequest().getClient();
 
         return new DriverCommentResource(
+                comment.getId(),
                 comment.getContent(),
                 comment.getRating(),
                 ClientSummaryResourceFromEntityAssembler.assemble(client)

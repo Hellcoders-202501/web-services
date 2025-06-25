@@ -10,6 +10,7 @@ public class DriverVehicleResourceFromEntityAssembler {
 
     public static DriverVehicleResource toResourceFromEntity(Vehicle vehicle) {
         return new DriverVehicleResource(
+                vehicle.getId(),
                 vehicle.getBrand(),
                 vehicle.getServices().stream()
                         .map(Service::getNameSpanish)
