@@ -1,4 +1,4 @@
-package com.techcompany.fastporte.trips.infrastructure.websocket;
+package com.techcompany.fastporte.shared.websocket;
 
 import com.techcompany.fastporte.users.domain.model.aggregates.enums.RoleName;
 import com.techcompany.fastporte.users.infrastructure.auth.jwt.JwtUtil;
@@ -43,20 +43,24 @@ public class NotificationWebSocketHandler extends TextWebSocketHandler {
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
-        Long userId = getUserIdFromToken(session);
-        System.out.println("Cerrando conexión para userId: " + userId);
+        try {
+            Long userId = getUserIdFromToken(session);
+            System.out.println("Cerrando conexión para userId: " + userId);
 
-        if (userSessions.containsKey(userId)) {
-            userSessions.get(userId).remove(session);
-            // Elimina la lista si está vacía para limpiar el mapa
-            if (userSessions.get(userId).isEmpty()) {
-                userSessions.remove(userId);
+            if (userSessions.containsKey(userId)) {
+                userSessions.get(userId).remove(session);
+                if (userSessions.get(userId).isEmpty()) {
+                    userSessions.remove(userId);
+                }
             }
-        }
 
-        // Imprimir el estado de las sesiones después de cerrar
-        System.out.println("Sesiones después de cerrar: " + userSessions);
+            System.out.println("Sesiones después de cerrar: " + userSessions);
+
+        } catch (Exception e) {
+            System.out.println("Excepción ignorada al cerrar conexión WebSocket (posiblemente por apagado): " + e.getMessage());
+        }
     }
+
 
 
     public void sendNotification(String notificationJson, Long userId) {

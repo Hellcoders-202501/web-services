@@ -11,4 +11,7 @@ public enum NotificationType {
 
     PAYMENT_NOTIFICATION,
 
+    // Cuando el viaje está completado
+    CONTRACT_NOTIFICATION
+
 }
