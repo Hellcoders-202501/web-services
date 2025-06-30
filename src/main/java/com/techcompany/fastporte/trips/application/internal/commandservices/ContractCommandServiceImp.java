@@ -1,7 +1,9 @@
 package com.techcompany.fastporte.trips.application.internal.commandservices;
 
 import com.techcompany.fastporte.shared.utils.Helper;
+import com.techcompany.fastporte.shared.websocket.SendNotificationWS;
 import com.techcompany.fastporte.trips.domain.model.aggregates.entities.*;
+import com.techcompany.fastporte.trips.domain.model.aggregates.enums.NotificationType;
 import com.techcompany.fastporte.trips.domain.model.aggregates.enums.PaymentStatusType;
 import com.techcompany.fastporte.trips.domain.model.aggregates.enums.RequestStatusType;
 import com.techcompany.fastporte.trips.domain.model.aggregates.enums.TripStatusType;
@@ -17,6 +19,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -31,8 +34,9 @@ public class ContractCommandServiceImp implements ContractCommandService {
     private final RequestStatusRepository requestStatusRepository;
     private final TripRepository tripRepository;
     private final TripStatusRepository tripStatusRepository;
+    private final SendNotificationWS sendNotificationWS;
 
-    public ContractCommandServiceImp(ContractRepository contractRepository, RequestRepository requestRepository, DriverRepository driverRepository, PaymentRepository paymentRepository, ApplicationRepository applicationRepository, PaymentStatusRepository paymentStatusRepository, RequestStatusRepository requestStatusRepository, TripRepository tripRepository, TripStatusRepository tripStatusRepository) {
+    public ContractCommandServiceImp(ContractRepository contractRepository, RequestRepository requestRepository, DriverRepository driverRepository, PaymentRepository paymentRepository, ApplicationRepository applicationRepository, PaymentStatusRepository paymentStatusRepository, RequestStatusRepository requestStatusRepository, TripRepository tripRepository, TripStatusRepository tripStatusRepository, SendNotificationWS sendNotificationWS) {
         this.contractRepository = contractRepository;
         this.requestRepository = requestRepository;
         this.paymentRepository = paymentRepository;
@@ -41,6 +45,7 @@ public class ContractCommandServiceImp implements ContractCommandService {
         this.requestStatusRepository = requestStatusRepository;
         this.tripRepository = tripRepository;
         this.tripStatusRepository = tripStatusRepository;
+        this.sendNotificationWS = sendNotificationWS;
     }
 
     @Override
@@ -87,6 +92,9 @@ public class ContractCommandServiceImp implements ContractCommandService {
 
         contract = contractRepository.save(contract);
 
+        /// Envío de notificación de creación de contrato
+        SaveContractNotification(contract.getId(), NotificationType.CONTRACT_CREATED);
+
         /// Crear el objeto de pagos
         PaymentStatus paymentStatus = paymentStatusRepository.findByStatus(PaymentStatusType.PENDING_APPROVAL);
         Payment payment = new Payment();
@@ -95,5 +103,18 @@ public class ContractCommandServiceImp implements ContractCommandService {
         payment.setStatus(paymentStatus);
 
         paymentRepository.save(payment);
+    }
+
+    public void SaveContractNotification(Long contractId, NotificationType notificationType) {
+        Optional<Contract> contract = contractRepository.findById(contractId);
+
+        if(contract.isEmpty()) {
+            throw new RuntimeException("Error: El contrato con id '" + contractId + "' no existe.");
+        }
+
+        Long driverId = contract.get().getDriver().getId();
+        Long clientId = contract.get().getRequest().getClient().getId();
+
+        sendNotificationWS.notifyDriverAndClient(driverId, clientId, notificationType, contractId);
     }
 }

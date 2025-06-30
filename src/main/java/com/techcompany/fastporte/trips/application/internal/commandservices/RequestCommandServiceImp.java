@@ -1,9 +1,11 @@
 package com.techcompany.fastporte.trips.application.internal.commandservices;
 
+import com.techcompany.fastporte.shared.websocket.SendNotificationWS;
 import com.techcompany.fastporte.trips.domain.model.aggregates.entities.Request;
 import com.techcompany.fastporte.trips.domain.model.aggregates.entities.RequestStatus;
 import com.techcompany.fastporte.trips.domain.model.aggregates.entities.Trip;
 import com.techcompany.fastporte.trips.domain.model.aggregates.entities.TripStatus;
+import com.techcompany.fastporte.trips.domain.model.aggregates.enums.NotificationType;
 import com.techcompany.fastporte.trips.domain.model.aggregates.enums.RequestStatusType;
 import com.techcompany.fastporte.trips.domain.model.aggregates.enums.TripStatusType;
 import com.techcompany.fastporte.trips.domain.model.commands.DeleteRequestCommand;
@@ -14,10 +16,12 @@ import com.techcompany.fastporte.trips.infrastructure.persistence.jpa.RequestSta
 import com.techcompany.fastporte.trips.infrastructure.persistence.jpa.ServiceRepository;
 import com.techcompany.fastporte.trips.infrastructure.persistence.jpa.TripStatusRepository;
 import com.techcompany.fastporte.users.domain.model.aggregates.entities.Client;
+import com.techcompany.fastporte.users.domain.model.aggregates.entities.User;
 import com.techcompany.fastporte.users.infrastructure.persistence.jpa.ClientRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -29,13 +33,15 @@ public class RequestCommandServiceImp implements RequestCommandService {
     private final TripStatusRepository tripStatusRepository;
     private final ClientRepository clientRepository;
     private final ServiceRepository serviceRepository;
+    private final SendNotificationWS sendNotificationWS;
 
-    public RequestCommandServiceImp(RequestRepository requestRepository, RequestStatusRepository requestStatusRepository, TripStatusRepository tripStatusRepository, ClientRepository clientRepository, ServiceRepository serviceRepository) {
+    public RequestCommandServiceImp(RequestRepository requestRepository, RequestStatusRepository requestStatusRepository, TripStatusRepository tripStatusRepository, ClientRepository clientRepository, ServiceRepository serviceRepository, SendNotificationWS sendNotificationWS) {
         this.requestRepository = requestRepository;
         this.requestStatusRepository = requestStatusRepository;
         this.tripStatusRepository = tripStatusRepository;
         this.clientRepository = clientRepository;
         this.serviceRepository = serviceRepository;
+        this.sendNotificationWS = sendNotificationWS;
     }
 
     @Override
@@ -60,7 +66,13 @@ public class RequestCommandServiceImp implements RequestCommandService {
             trip.setRequest(request);
             request.setTrip(trip);
 
-            return Optional.of(requestRepository.save(request));
+            request = requestRepository.save(request);
+
+            /// Notificar a los conductores que cuentan un servicio del tipo publicado
+            List<User> users = requestRepository.findUserDriversIdsByServiceId(command.serviceId());
+            sendNotificationWS.NotifyRangeOfUsers(users, NotificationType.REQUEST_PUBLISHED, request.getId());
+
+            return Optional.of(request);
 
         } else {
             String mensajeError = "";

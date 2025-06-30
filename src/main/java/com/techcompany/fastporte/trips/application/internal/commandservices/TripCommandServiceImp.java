@@ -9,7 +9,6 @@ import com.techcompany.fastporte.trips.domain.model.commands.*;
 import com.techcompany.fastporte.trips.domain.services.TripCommandService;
 import com.techcompany.fastporte.trips.infrastructure.persistence.jpa.*;
 import com.techcompany.fastporte.users.domain.model.aggregates.entities.Driver;
-import com.techcompany.fastporte.users.domain.model.aggregates.entities.Client;
 import com.techcompany.fastporte.users.infrastructure.persistence.jpa.DriverRepository;
 import com.techcompany.fastporte.users.infrastructure.persistence.jpa.ClientRepository;
 import org.springframework.stereotype.Service;
@@ -91,6 +90,7 @@ public class TripCommandServiceImp implements TripCommandService {
 
                 trip.setStatus(tripStatus.get());
                 tripRepository.updateStatusById(command.tripId(), tripStatus.get().getId());
+                SaveTripNotification(command.tripId(), NotificationType.TRIP_COMPLETED);
 
             } else {
 
@@ -113,18 +113,7 @@ public class TripCommandServiceImp implements TripCommandService {
         Long driverId = trip.get().getRequest().getContract().getDriver().getId();
         Long clientId = trip.get().getRequest().getClient().getId();
 
-        Optional<Driver> driver = driverRepository.findById(driverId);
-        Optional<Client> client = clientRepository.findById(clientId);
-
-        if (driver.isEmpty() || client.isEmpty()) {
-            throw new RuntimeException("Error: The driver with id '" + driverId + "' or client with id'" + clientId + "' does not exist in the database");
-        }
-
-        // Enviar notificación en tiempo real al conductor
-        sendNotificationWS.send(driver.get().getUser(), notificationType, tripId);
-
-        // Enviar notificación en tiempo real al cliente
-        sendNotificationWS.send(client.get().getUser(), notificationType, tripId);
+        sendNotificationWS.notifyDriverAndClient(driverId, clientId, notificationType, tripId);
     }
 
     @Override
