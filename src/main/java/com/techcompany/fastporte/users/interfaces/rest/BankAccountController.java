@@ -39,11 +39,11 @@ public class BankAccountController {
         this.driverQueryService = driverQueryService;
     }
 
-    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> findById(@PathVariable Long id) {
+    @GetMapping(value = "/{driverId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> findById(@PathVariable Long driverId) {
         try{
 
-            Optional<BankAccount> bankAccount = driverQueryService.handle(new GetBankAccountQuery(id));
+            Optional<BankAccount> bankAccount = driverQueryService.handle(new GetBankAccountQuery(driverId));
 
             if (bankAccount.isPresent()) {
                 var bAccount = BankAccountResourceFromEntityAssembler.toResourceFromEntity(bankAccount.get());

@@ -75,7 +75,7 @@ public class TripCommandServiceImp implements TripCommandService {
         SaveTripNotification(command.tripId(), NotificationType.TRIP_FINISHED_BY_DRIVER);
     }
 
-
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void handle(FinishTripByClientCommand command) {
         Optional<TripStatus> tripStatus = tripStatusRepository.findByStatus(TripStatusType.FINISHED_BY_CLIENT);
@@ -102,10 +102,15 @@ public class TripCommandServiceImp implements TripCommandService {
 
                 /// Agregar transacción
                 Long driverId = trip.getRequest().getContract().getDriver().getId();
-                BankAccount bankAccount = bankAccountRepository.findByDriver_id(driverId).get();
-                Transaction transaction = new Transaction(bankAccount, trip.getAmount());
+                Optional<BankAccount> bankAccount = bankAccountRepository.findByDriver_id(driverId);
 
-                transactionRepository.save(transaction);
+                if (bankAccount.isPresent()) {
+                    Transaction transaction = new Transaction(bankAccount.get(), trip.getAmount());
+                    transactionRepository.save(transaction);
+                } else {
+                    ///  Rollback a todas las transacciones realizadas
+                    throw new RuntimeException("No se encontró una cuenta bancaria para el conductor. No se puede completar la transacción hasta que el conductor agregue una para realizar el pago.");
+                }
 
             } else {
 
