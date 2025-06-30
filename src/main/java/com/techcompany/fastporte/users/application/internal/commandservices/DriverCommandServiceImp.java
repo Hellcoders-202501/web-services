@@ -1,5 +1,6 @@
 package com.techcompany.fastporte.users.application.internal.commandservices;
 
+import com.techcompany.fastporte.trips.infrastructure.persistence.jpa.ServiceRepository;
 import com.techcompany.fastporte.users.domain.model.aggregates.entities.*;
 import com.techcompany.fastporte.users.domain.model.aggregates.enums.RoleName;
 import com.techcompany.fastporte.users.domain.model.commands.driver.*;
@@ -23,14 +24,16 @@ public class DriverCommandServiceImp implements DriverCommandService {
     private final RoleRepository roleRepository;
     private final ExperienceRepository experienceRepository;
     private final VehicleRepository vehicleRepository;
+    private final ServiceRepository serviceRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public DriverCommandServiceImp(UserRepository userRepository, DriverRepository driverRepository, RoleRepository roleRepository, ExperienceRepository experienceRepository, VehicleRepository vehicleRepository, PasswordEncoder passwordEncoder) {
+    public DriverCommandServiceImp(UserRepository userRepository, DriverRepository driverRepository, RoleRepository roleRepository, ExperienceRepository experienceRepository, VehicleRepository vehicleRepository, ServiceRepository serviceRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.driverRepository = driverRepository;
         this.roleRepository = roleRepository;
         this.experienceRepository = experienceRepository;
         this.vehicleRepository = vehicleRepository;
+        this.serviceRepository = serviceRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -111,8 +114,12 @@ public class DriverCommandServiceImp implements DriverCommandService {
         Driver driver = driverRepository.findById(command.driverId())
                 .orElseThrow(() -> new DriverNotFoundException(command.driverId()));
 
+        com.techcompany.fastporte.trips.domain.model.aggregates.entities.Service service = new com.techcompany.fastporte.trips.domain.model.aggregates.entities.Service();
+        service = serviceRepository.findById(command.serviceId()).get();
+
         Vehicle vehicle = new Vehicle(command.brand(), command.imageUrl());
         vehicle.setDriver(driver);
+        vehicle.getServices().add(service);
         driver.getVehicles().add(vehicle);
         driverRepository.save(driver);
 
