@@ -2,14 +2,10 @@ package com.techcompany.fastporte.users.application.internal.queryservices;
 
 import com.techcompany.fastporte.trips.domain.model.aggregates.entities.Comment;
 import com.techcompany.fastporte.trips.infrastructure.persistence.jpa.CommentRepository;
-import com.techcompany.fastporte.users.domain.model.aggregates.entities.Driver;
-import com.techcompany.fastporte.users.domain.model.aggregates.entities.Experience;
-import com.techcompany.fastporte.users.domain.model.aggregates.entities.Vehicle;
+import com.techcompany.fastporte.users.domain.model.aggregates.entities.*;
 import com.techcompany.fastporte.users.domain.model.queries.driver.*;
 import com.techcompany.fastporte.users.domain.services.driver.DriverQueryService;
-import com.techcompany.fastporte.users.infrastructure.persistence.jpa.DriverRepository;
-import com.techcompany.fastporte.users.infrastructure.persistence.jpa.ExperienceRepository;
-import com.techcompany.fastporte.users.infrastructure.persistence.jpa.VehicleRepository;
+import com.techcompany.fastporte.users.infrastructure.persistence.jpa.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,12 +20,16 @@ public class DriverQueryServiceImp implements DriverQueryService {
     private final VehicleRepository vehicleRepository;
     private final ExperienceRepository experienceRepository;
     private final CommentRepository commentRepository;
+    private final BankAccountRepository bankAccountRepository;
+    private final BankAccountTypeRepository bankAccountTypeRepository;
 
-    public DriverQueryServiceImp(DriverRepository driverRepository, VehicleRepository vehicleRepository, ExperienceRepository experienceRepository, CommentRepository commentRepository) {
+    public DriverQueryServiceImp(DriverRepository driverRepository, VehicleRepository vehicleRepository, ExperienceRepository experienceRepository, CommentRepository commentRepository, BankAccountRepository bankAccountRepository, BankAccountTypeRepository bankAccountTypeRepository) {
         this.driverRepository = driverRepository;
         this.vehicleRepository = vehicleRepository;
         this.experienceRepository = experienceRepository;
         this.commentRepository = commentRepository;
+        this.bankAccountRepository = bankAccountRepository;
+        this.bankAccountTypeRepository = bankAccountTypeRepository;
     }
 
     @Override
@@ -80,5 +80,15 @@ public class DriverQueryServiceImp implements DriverQueryService {
     @Override
     public List<Driver> handle(GetMostRankedDriversQuery query) {
         return driverRepository.findTop3ByOrderByRatingDesc();
+    }
+
+    @Override
+    public Optional<BankAccount> handle(GetBankAccountQuery query) {
+        return bankAccountRepository.findByDriver_id(query.driverId());
+    }
+
+    @Override
+    public List<BankAccountType> handle(GetAllBankAccountTypesQuery query) {
+        return bankAccountTypeRepository.findAll();
     }
 }

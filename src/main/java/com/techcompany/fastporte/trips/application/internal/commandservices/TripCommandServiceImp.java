@@ -8,9 +8,13 @@ import com.techcompany.fastporte.trips.domain.model.aggregates.enums.TripStatusT
 import com.techcompany.fastporte.trips.domain.model.commands.*;
 import com.techcompany.fastporte.trips.domain.services.TripCommandService;
 import com.techcompany.fastporte.trips.infrastructure.persistence.jpa.*;
+import com.techcompany.fastporte.users.domain.model.aggregates.entities.BankAccount;
 import com.techcompany.fastporte.users.domain.model.aggregates.entities.Driver;
+import com.techcompany.fastporte.users.domain.model.aggregates.entities.Transaction;
+import com.techcompany.fastporte.users.infrastructure.persistence.jpa.BankAccountRepository;
 import com.techcompany.fastporte.users.infrastructure.persistence.jpa.DriverRepository;
 import com.techcompany.fastporte.users.infrastructure.persistence.jpa.ClientRepository;
+import com.techcompany.fastporte.users.infrastructure.persistence.jpa.TransactionRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,8 +33,10 @@ public class TripCommandServiceImp implements TripCommandService {
     private final SendNotificationWS sendNotificationWS;
 
     private final PaymentRepository paymentRepository;
+    private final BankAccountRepository bankAccountRepository;
+    private final TransactionRepository transactionRepository;
 
-    public TripCommandServiceImp(TripRepository tripRepository, TripStatusRepository tripStatusRepository, DriverRepository driverRepository, ClientRepository clientRepository, CommentRepository commentRepository, PaymentStatusRepository paymentStatusRepository, SendNotificationWS sendNotificationWS, PaymentRepository paymentRepository) {
+    public TripCommandServiceImp(TripRepository tripRepository, TripStatusRepository tripStatusRepository, DriverRepository driverRepository, ClientRepository clientRepository, CommentRepository commentRepository, PaymentStatusRepository paymentStatusRepository, SendNotificationWS sendNotificationWS, PaymentRepository paymentRepository, BankAccountRepository bankAccountRepository, TransactionRepository transactionRepository) {
         this.tripRepository = tripRepository;
         this.tripStatusRepository = tripStatusRepository;
         this.driverRepository = driverRepository;
@@ -39,6 +45,8 @@ public class TripCommandServiceImp implements TripCommandService {
         this.paymentStatusRepository = paymentStatusRepository;
         this.sendNotificationWS = sendNotificationWS;
         this.paymentRepository = paymentRepository;
+        this.bankAccountRepository = bankAccountRepository;
+        this.transactionRepository = transactionRepository;
     }
 
     @Override
@@ -91,6 +99,13 @@ public class TripCommandServiceImp implements TripCommandService {
                 trip.setStatus(tripStatus.get());
                 tripRepository.updateStatusById(command.tripId(), tripStatus.get().getId());
                 SaveTripNotification(command.tripId(), NotificationType.TRIP_COMPLETED);
+
+                /// Agregar transacción
+                Long driverId = trip.getRequest().getContract().getDriver().getId();
+                BankAccount bankAccount = bankAccountRepository.findByDriver_id(driverId).get();
+                Transaction transaction = new Transaction(bankAccount, trip.getAmount());
+
+                transactionRepository.save(transaction);
 
             } else {
 

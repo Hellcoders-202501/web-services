@@ -26,8 +26,10 @@ public class DriverCommandServiceImp implements DriverCommandService {
     private final VehicleRepository vehicleRepository;
     private final ServiceRepository serviceRepository;
     private final PasswordEncoder passwordEncoder;
+    private final BankAccountRepository bankAccountRepository;
+    private final BankAccountTypeRepository bankAccountTypeRepository;
 
-    public DriverCommandServiceImp(UserRepository userRepository, DriverRepository driverRepository, RoleRepository roleRepository, ExperienceRepository experienceRepository, VehicleRepository vehicleRepository, ServiceRepository serviceRepository, PasswordEncoder passwordEncoder) {
+    public DriverCommandServiceImp(UserRepository userRepository, DriverRepository driverRepository, RoleRepository roleRepository, ExperienceRepository experienceRepository, VehicleRepository vehicleRepository, ServiceRepository serviceRepository, PasswordEncoder passwordEncoder, BankAccountRepository bankAccountRepository, BankAccountTypeRepository bankAccountTypeRepository) {
         this.userRepository = userRepository;
         this.driverRepository = driverRepository;
         this.roleRepository = roleRepository;
@@ -35,6 +37,8 @@ public class DriverCommandServiceImp implements DriverCommandService {
         this.vehicleRepository = vehicleRepository;
         this.serviceRepository = serviceRepository;
         this.passwordEncoder = passwordEncoder;
+        this.bankAccountRepository = bankAccountRepository;
+        this.bankAccountTypeRepository = bankAccountTypeRepository;
     }
 
     @Override
@@ -129,5 +133,46 @@ public class DriverCommandServiceImp implements DriverCommandService {
     @Override
     public void handle(DeleteDriverVehicleCommand command) {
         vehicleRepository.deleteById(command.vehicleId());
+    }
+
+    @Override
+    public Optional<BankAccount> handle(AddBankAccountCommand command) {
+
+        Driver driver = driverRepository.findById(command.driverId()).get();
+        BankAccountType type = bankAccountTypeRepository.findById(command.accountTypeId()).get();
+        BankAccount bankAccount = new BankAccount(driver, command.bankName(), command.accountNumber(), type);
+
+        return Optional.of(bankAccountRepository.save(bankAccount));
+    }
+
+    @Override
+    public void handle(DeleteBankAccountCommand command) {
+
+        Optional<BankAccount> bankAccount = bankAccountRepository.findById(command.id());
+
+        if (bankAccount.isEmpty()) {
+            throw new RuntimeException("Cuenta bancaria no encontrada.");
+        }
+
+        bankAccountRepository.deleteById(command.id());
+    }
+
+    @Override
+    public void handle(UpdateBankAccountCommand command) {
+
+        Optional<BankAccount> bankAccount = bankAccountRepository.findById(command.id());
+
+        if (bankAccount.isEmpty()) {
+            throw new RuntimeException("Cuenta bancaria no encontrada.");
+        }
+
+        BankAccount bankAccount1 = bankAccount.get();
+        BankAccountType type = bankAccountTypeRepository.findById(command.accountTypeId()).get();
+
+        bankAccount1.setBankName(command.bankName());
+        bankAccount1.setAccountNumber(command.accountNumber());
+        bankAccount1.setAccountType(type);
+
+        bankAccountRepository.save(bankAccount1);
     }
 }

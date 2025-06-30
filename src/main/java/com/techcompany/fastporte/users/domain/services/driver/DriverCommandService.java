@@ -1,5 +1,6 @@
 package com.techcompany.fastporte.users.domain.services.driver;
 
+import com.techcompany.fastporte.users.domain.model.aggregates.entities.BankAccount;
 import com.techcompany.fastporte.users.domain.model.aggregates.entities.Driver;
 import com.techcompany.fastporte.users.domain.model.aggregates.entities.Experience;
 import com.techcompany.fastporte.users.domain.model.aggregates.entities.Vehicle;
@@ -16,4 +17,7 @@ public interface DriverCommandService {
     void handle(DeleteDriverExperienceCommand command);
     Optional<Vehicle> handle (AddDriverVehicleCommand command);
     void handle(DeleteDriverVehicleCommand command);
+    Optional<BankAccount> handle (AddBankAccountCommand command);
+    void handle(DeleteBankAccountCommand command);
+    void handle(UpdateBankAccountCommand command);
 }

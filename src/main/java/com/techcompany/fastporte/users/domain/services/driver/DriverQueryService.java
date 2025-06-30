@@ -1,9 +1,7 @@
 package com.techcompany.fastporte.users.domain.services.driver;
 
 import com.techcompany.fastporte.trips.domain.model.aggregates.entities.Comment;
-import com.techcompany.fastporte.users.domain.model.aggregates.entities.Driver;
-import com.techcompany.fastporte.users.domain.model.aggregates.entities.Experience;
-import com.techcompany.fastporte.users.domain.model.aggregates.entities.Vehicle;
+import com.techcompany.fastporte.users.domain.model.aggregates.entities.*;
 import com.techcompany.fastporte.users.domain.model.queries.driver.*;
 
 import java.util.List;
@@ -23,4 +21,6 @@ public interface DriverQueryService {
     List<Vehicle> handle(GetAllVehiclesByDriverIdQuery query);
     List<Comment> handle(GetAllCommentsByDriverIdQuery query);
     List<Driver> handle(GetMostRankedDriversQuery query);
+    Optional<BankAccount> handle(GetBankAccountQuery query);
+    List<BankAccountType> handle(GetAllBankAccountTypesQuery query);
 }

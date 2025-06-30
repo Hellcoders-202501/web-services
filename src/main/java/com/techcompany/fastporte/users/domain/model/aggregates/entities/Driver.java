@@ -38,6 +38,9 @@ public class Driver implements Serializable {
     @OneToMany(mappedBy = "driver", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Contract> contracts = new ArrayList<>();
 
+    @OneToOne(mappedBy = "driver", cascade = CascadeType.ALL, orphanRemoval = true)
+    private BankAccount bankAccount;
+
     public Driver(RegisterDriverCommand command) {
         this.user = new User(command);
         this.rating = 0D;
