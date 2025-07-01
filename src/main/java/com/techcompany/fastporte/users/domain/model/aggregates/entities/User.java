@@ -60,6 +60,9 @@ public class User implements Serializable {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Notification> notifications;
 
+    @OneToOne(mappedBy = "user")
+    private Driver driver;
+
     public User(RegisterDriverCommand command) {
         this.name = command.name();
         this.firstLastName = command.firstLastName();

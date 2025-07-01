@@ -28,14 +28,13 @@ public interface RequestRepository extends JpaRepository<Request, Long> {
 
     List<Request> findAllByContract_Driver_IdAndTrip_Status_StatusIsNot(Long driverId, TripStatusType tripStatus);
 
-    @Query(value = """
-        SELECT DISTINCT u FROM user u
-        JOIN driver dr ON dr.user_id = u.id
-        JOIN vehicle v ON v.driver_id = dr.id
-        JOIN vehicle_service vs ON vs.vehicle_id = v.id
-        JOIN service s ON s.id = vs.service_id
-        WHERE s.id = :serviceId
-    """, nativeQuery = true)
+    @Query("""
+    SELECT DISTINCT u FROM User u
+    JOIN u.driver d
+    JOIN d.vehicles v
+    JOIN v.services s
+    WHERE s.id = :serviceId
+    """)
     List<User> findUserDriversIdsByServiceId(@Param("serviceId") Long serviceId);
 
 }
