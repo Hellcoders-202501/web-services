@@ -148,13 +148,24 @@ public class DriverCommandServiceImp implements DriverCommandService {
     @Override
     public void handle(DeleteBankAccountCommand command) {
 
-        Optional<BankAccount> bankAccount = bankAccountRepository.findById(command.id());
+        Optional<BankAccount> bankAccountOpt = bankAccountRepository.findById(command.id());
 
-        if (bankAccount.isEmpty()) {
+        if (bankAccountOpt.isEmpty()) {
             throw new RuntimeException("Cuenta bancaria no encontrada.");
         }
 
-        bankAccountRepository.deleteById(command.id());
+        BankAccount bankAccount = bankAccountOpt.get();
+        Driver driver = bankAccount.getDriver();
+
+        // Romper la relación en memoria y persistirla
+        driver.setBankAccount(null);
+        bankAccount.setDriver(null);
+
+        // Persistir cambio en el lado del Driver
+        driverRepository.save(driver);
+
+        // Eliminar la cuenta bancaria
+        bankAccountRepository.delete(bankAccount);
     }
 
     @Override
