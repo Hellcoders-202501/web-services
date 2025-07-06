@@ -36,13 +36,13 @@ public class Request implements Serializable {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    @OneToOne(mappedBy = "request", cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
+    @OneToOne(mappedBy = "request", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
     private Trip trip;
 
-    @OneToOne(mappedBy = "request", cascade = CascadeType.REMOVE)
+    @OneToOne(mappedBy = "request", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private Contract contract;
 
-    @OneToMany(mappedBy = "request", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "request", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Application> applications;
 
     public Request() {

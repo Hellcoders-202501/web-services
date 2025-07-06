@@ -31,8 +31,7 @@ public class Contract implements Serializable {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    @OneToOne(mappedBy = "contract")
-    //@JoinColumn(name = "payment_id")
+    @OneToOne(mappedBy = "contract", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private Payment payment;
 
     public Contract() {

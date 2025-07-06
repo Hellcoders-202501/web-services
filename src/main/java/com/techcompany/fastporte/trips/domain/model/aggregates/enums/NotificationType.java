@@ -12,5 +12,6 @@ public enum NotificationType {
 
     TRIP_PAID,                      /// Cuando el viaje se pagó al conductor
 
-    CONTRACT_CREATED                /// Cuando se crea un contrato
+    CONTRACT_CREATED,               /// Cuando se crea un contrato
+    CONTRACT_CANCELED               /// Cuando se cancelar un contrato
 }

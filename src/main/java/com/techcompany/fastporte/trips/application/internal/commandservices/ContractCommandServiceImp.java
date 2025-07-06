@@ -8,6 +8,7 @@ import com.techcompany.fastporte.trips.domain.model.aggregates.enums.PaymentStat
 import com.techcompany.fastporte.trips.domain.model.aggregates.enums.RequestStatusType;
 import com.techcompany.fastporte.trips.domain.model.aggregates.enums.TripStatusType;
 import com.techcompany.fastporte.trips.domain.model.commands.AcceptDriverApplicationCommand;
+import com.techcompany.fastporte.trips.domain.model.commands.CancelContractCommand;
 import com.techcompany.fastporte.trips.domain.services.ContractCommandService;
 import com.techcompany.fastporte.trips.infrastructure.persistence.jpa.*;
 import com.techcompany.fastporte.users.domain.model.aggregates.entities.Driver;
@@ -17,10 +18,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -104,6 +103,26 @@ public class ContractCommandServiceImp implements ContractCommandService {
 
         paymentRepository.save(payment);
     }
+
+    @Override
+    public void handle(CancelContractCommand command) {
+
+        Optional<Request> request = requestRepository.findById(command.requestId());
+
+        if (request.isEmpty()) {
+            throw new RuntimeException("No se encontró la solicitud del contrato asociada");
+        }
+
+        // Si el contrato está tomado y tiene estado de viaje pendiente, entonces se puede eliminar
+        if (request.get().getStatus().getStatus() == RequestStatusType.TAKEN && request.get().getTrip().getStatus().getStatus() == TripStatusType.PENDING){
+            SaveContractNotification(request.get().getContract().getId(), NotificationType.CONTRACT_CANCELED);
+            requestRepository.delete(request.get());
+        }
+        else {
+            throw new RuntimeException("No se puede eliminar un contrato con viaje en curso");
+        }
+    }
+
 
     public void SaveContractNotification(Long contractId, NotificationType notificationType) {
         Optional<Contract> contract = contractRepository.findById(contractId);
