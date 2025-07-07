@@ -145,7 +145,7 @@ public class TripCommandServiceImp implements TripCommandService {
             throw new RuntimeException("Viaje con id " + command.tripId() + " no existe");
         }
 
-        if (trip.getStatus().getStatus() != TripStatusType.FINISHED_BY_CLIENT) {
+        if (trip.getStatus().getStatus() != TripStatusType.COMPLETED) {
             throw new RuntimeException("Viaje con id " + command.tripId() + " no está finalizado");
         }
 
