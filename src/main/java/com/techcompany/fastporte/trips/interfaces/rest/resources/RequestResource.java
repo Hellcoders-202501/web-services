@@ -8,6 +8,7 @@ public record RequestResource(
         ServiceResource service,
         String status,
         TripInformationResource trip,
-        ContractResource contract
+        ContractResource contract,
+        boolean hasComment
 ) {
 }

@@ -23,7 +23,8 @@ public class RequestResourceFromEntityAssembler {
                 new ServiceResource(request.getService().getId(), request.getService().getNameSpanish()),
                 request.getStatus().getStatus().name(),
                 TripInformationResourceFromEntityAssembler.toResourceFromEntity(trip),
-                contract == null ? null : ContractResourceFromEntityAssembler.toResourceFromEntity(contract)
+                contract == null ? null : ContractResourceFromEntityAssembler.toResourceFromEntity(contract),
+                trip.getComment() != null
         );
     }
 }
