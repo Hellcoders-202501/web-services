@@ -77,7 +77,24 @@ public class NotificationWebSocketHandler extends TextWebSocketHandler {
 
     private Long getUserIdFromToken(WebSocketSession session) {
         // Extrae el token JWT desde los headers de la sesión
-        String token = Objects.requireNonNull(session.getHandshakeHeaders().getFirst("Authorization")).replace("Bearer ", "");
+        // String token = Objects.requireNonNull(session.getHandshakeHeaders().getFirst("Authorization")).replace("Bearer ", "");
+
+        String query = Objects.requireNonNull(session.getUri()).getQuery();
+        String token = null;
+
+        if (query != null) {
+            for (String param : query.split("&")) {
+                String[] pair = param.split("=");
+                if (pair.length == 2 && pair[0].equals("token")) {
+                    token = pair[1];
+                    break;
+                }
+            }
+        }
+
+        if (token == null) {
+            throw new IllegalArgumentException("Token no proporcionado en la conexión WebSocket");
+        }
 
         // Decodifica el token para obtener el userId y el rol
 
